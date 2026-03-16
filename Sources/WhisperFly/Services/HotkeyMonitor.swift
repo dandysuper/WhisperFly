@@ -43,7 +43,7 @@ final class HotkeyMonitor: HotkeyMonitoring, @unchecked Sendable {
         )
         
         guard status == noErr else {
-            throw NSError(domain: "WhisperFlow", code: 20, userInfo: [NSLocalizedDescriptionKey: "Failed to install hotkey handler: \(status)"])
+            throw NSError(domain: "WhisperFly", code: 20, userInfo: [NSLocalizedDescriptionKey: "Failed to install hotkey handler: \(status)"])
         }
         self.handlerRef = handlerRef
         
@@ -52,7 +52,7 @@ final class HotkeyMonitor: HotkeyMonitoring, @unchecked Sendable {
         let regStatus = RegisterEventHotKey(keyCode, modifiers, id, GetApplicationEventTarget(), 0, &ref)
         
         guard regStatus == noErr else {
-            throw NSError(domain: "WhisperFlow", code: 21, userInfo: [NSLocalizedDescriptionKey: "Failed to register hotkey: \(regStatus)"])
+            throw NSError(domain: "WhisperFly", code: 21, userInfo: [NSLocalizedDescriptionKey: "Failed to register hotkey: \(regStatus)"])
         }
         self.hotkeyRef = ref
     }

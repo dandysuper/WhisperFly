@@ -1,4 +1,4 @@
-# WhisperFlow
+# WhisperFly
 
 A macOS menu-bar push-to-talk dictation app with **free** cloud-based speech recognition. Fork of [qwenwishper](https://github.com/hukopo/qwenwishper) — replaces all local model inference with lightweight API calls.
 
@@ -27,7 +27,7 @@ A macOS menu-bar push-to-talk dictation app with **free** cloud-based speech rec
 3. Build & run:
    ```bash
    swift build
-   swift run WhisperFlow
+   swift run WhisperFly
    ```
 
 4. Grant **Microphone** and **Accessibility** permissions when prompted.

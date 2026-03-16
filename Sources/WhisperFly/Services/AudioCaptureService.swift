@@ -13,7 +13,7 @@ final class AudioCaptureService: NSObject, AudioCapturing, @unchecked Sendable {
     
     private let recordingsDir: URL = {
         let dir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("WhisperFlow/Recordings", isDirectory: true)
+            .appendingPathComponent("WhisperFly/Recordings", isDirectory: true)
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir
     }()
@@ -39,7 +39,7 @@ final class AudioCaptureService: NSObject, AudioCapturing, @unchecked Sendable {
         rec.prepareToRecord()
         
         guard rec.record() else {
-            throw NSError(domain: "WhisperFlow", code: 10, userInfo: [NSLocalizedDescriptionKey: "Failed to start recording"])
+            throw NSError(domain: "WhisperFly", code: 10, userInfo: [NSLocalizedDescriptionKey: "Failed to start recording"])
         }
         
         self.recorder = rec
@@ -73,7 +73,7 @@ final class AudioCaptureService: NSObject, AudioCapturing, @unchecked Sendable {
         }
         
         guard let rec = recorder, let url = recordingURL else {
-            throw NSError(domain: "WhisperFlow", code: 11, userInfo: [NSLocalizedDescriptionKey: "No active recording"])
+            throw NSError(domain: "WhisperFly", code: 11, userInfo: [NSLocalizedDescriptionKey: "No active recording"])
         }
         
         rec.stop()

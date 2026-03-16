@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct WhisperFlowApp: App {
+struct WhisperFlyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var controller = AppController()
     

@@ -54,12 +54,12 @@ actor NIMCanaryRecognizer: SpeechRecognizer {
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw NSError(domain: "WhisperFlow", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response"])
+            throw NSError(domain: "WhisperFly", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response"])
         }
 
         guard httpResponse.statusCode == 200 else {
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
-            throw NSError(domain: "WhisperFlow", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "NIM API error (\(httpResponse.statusCode)): \(errorBody)"])
+            throw NSError(domain: "WhisperFly", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "NIM API error (\(httpResponse.statusCode)): \(errorBody)"])
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
@@ -76,7 +76,7 @@ actor NIMCanaryRecognizer: SpeechRecognizer {
 
         let frameCount = AVAudioFrameCount(inputFile.length)
         guard let inputBuffer = AVAudioPCMBuffer(pcmFormat: inputFile.processingFormat, frameCapacity: frameCount) else {
-            throw NSError(domain: "WhisperFlow", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to create input buffer"])
+            throw NSError(domain: "WhisperFly", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to create input buffer"])
         }
         try inputFile.read(into: inputBuffer)
 
@@ -85,10 +85,10 @@ actor NIMCanaryRecognizer: SpeechRecognizer {
             outputBuffer = inputBuffer
         } else {
             guard let converter = AVAudioConverter(from: inputFile.processingFormat, to: targetFormat) else {
-                throw NSError(domain: "WhisperFlow", code: 3, userInfo: [NSLocalizedDescriptionKey: "Audio format conversion not possible"])
+                throw NSError(domain: "WhisperFly", code: 3, userInfo: [NSLocalizedDescriptionKey: "Audio format conversion not possible"])
             }
             guard let converted = AVAudioPCMBuffer(pcmFormat: targetFormat, frameCapacity: frameCount) else {
-                throw NSError(domain: "WhisperFlow", code: 4, userInfo: [NSLocalizedDescriptionKey: "Failed to create output buffer"])
+                throw NSError(domain: "WhisperFly", code: 4, userInfo: [NSLocalizedDescriptionKey: "Failed to create output buffer"])
             }
             try converter.convert(to: converted, from: inputBuffer)
             outputBuffer = converted

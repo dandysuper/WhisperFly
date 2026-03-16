@@ -2,18 +2,18 @@
 import PackageDescription
 
 let package = Package(
-    name: "WhisperFlow",
+    name: "WhisperFly",
     platforms: [.macOS(.v14)],
     targets: [
         .executableTarget(
-            name: "WhisperFlow",
-            path: "Sources/WhisperFlow",
+            name: "WhisperFly",
+            path: "Sources/WhisperFly",
             resources: [.copy("Resources")]
         ),
         .testTarget(
-            name: "WhisperFlowTests",
-            dependencies: ["WhisperFlow"],
-            path: "Tests/WhisperFlowTests"
+            name: "WhisperFlyTests",
+            dependencies: ["WhisperFly"],
+            path: "Tests/WhisperFlyTests"
         ),
     ]
 )

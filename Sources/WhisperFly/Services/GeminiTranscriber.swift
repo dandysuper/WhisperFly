@@ -43,19 +43,19 @@ actor GeminiTranscriber: SpeechRecognizer {
         request.httpMethod = "POST"
         request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("WhisperFlow/1.0", forHTTPHeaderField: "HTTP-Referer")
-        request.setValue("WhisperFlow", forHTTPHeaderField: "X-Title")
+        request.setValue("WhisperFly/1.0", forHTTPHeaderField: "HTTP-Referer")
+        request.setValue("WhisperFly", forHTTPHeaderField: "X-Title")
         request.httpBody = try JSONSerialization.data(withJSONObject: requestBody)
         
         let (data, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw NSError(domain: "WhisperFlow", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from OpenRouter"])
+            throw NSError(domain: "WhisperFly", code: -1, userInfo: [NSLocalizedDescriptionKey: "Invalid response from OpenRouter"])
         }
         
         guard httpResponse.statusCode == 200 else {
             let errorBody = String(data: data, encoding: .utf8) ?? "Unknown error"
-            throw NSError(domain: "WhisperFlow", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "OpenRouter API error (\(httpResponse.statusCode)): \(errorBody)"])
+            throw NSError(domain: "WhisperFly", code: httpResponse.statusCode, userInfo: [NSLocalizedDescriptionKey: "OpenRouter API error (\(httpResponse.statusCode)): \(errorBody)"])
         }
         
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
