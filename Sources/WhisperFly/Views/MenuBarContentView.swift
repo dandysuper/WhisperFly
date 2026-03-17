@@ -16,7 +16,7 @@ struct MenuBarContentView: View {
                 if !controller.hasValidAPIKeys {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundColor(.yellow)
-                        .help("API keys not configured")
+                        .help(Text("menu.api_keys_missing"))
                 }
             }
             
@@ -33,7 +33,7 @@ struct MenuBarContentView: View {
                 HStack {
                     Image(systemName: controller.status == .recording ? "stop.circle.fill" : "mic.circle.fill")
                         .font(.title2)
-                    Text(controller.status == .recording ? "Stop Recording" : "Start Recording")
+                    Text(controller.status == .recording ? "menu.stop_recording" : "menu.start_recording")
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 4)
@@ -50,10 +50,10 @@ struct MenuBarContentView: View {
             }
             
             // Backend Info
-            GroupBox("Transcription") {
+            GroupBox(String(localized: "menu.transcription", defaultValue: "Transcription")) {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Text("Backend:")
+                        Text("menu.backend")
                             .foregroundColor(.secondary)
                         Text(controller.settings.transcriptionBackend.rawValue)
                             .fontWeight(.medium)
@@ -62,9 +62,9 @@ struct MenuBarContentView: View {
                     
                     if controller.settings.geminiRewriteEnabled {
                         HStack {
-                            Text("Rewrite:")
+                            Text("menu.rewrite")
                                 .foregroundColor(.secondary)
-                            Text(controller.settings.rewriteMode.rawValue)
+                            Text(controller.settings.rewriteMode.localizedName)
                                 .fontWeight(.medium)
                         }
                         .font(.caption)
@@ -72,7 +72,7 @@ struct MenuBarContentView: View {
                     
                     if controller.lastLatency > 0 {
                         HStack {
-                            Text("Last latency:")
+                            Text("menu.last_latency")
                                 .foregroundColor(.secondary)
                             Text(String(format: "%.1fs", controller.lastLatency))
                                 .fontWeight(.medium)
@@ -85,9 +85,9 @@ struct MenuBarContentView: View {
             
             // Last Transcription
             if !controller.lastTranscription.isEmpty {
-                GroupBox("Last Result") {
+                GroupBox(String(localized: "menu.last_result", defaultValue: "Last Result")) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Raw:")
+                        Text("menu.raw")
                             .font(.caption)
                             .foregroundColor(.secondary)
                         Text(controller.lastTranscription)
@@ -96,7 +96,7 @@ struct MenuBarContentView: View {
                             .lineLimit(3)
                         
                         if !controller.lastRewrite.isEmpty {
-                            Text("Rewritten:")
+                            Text("menu.rewritten")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                                 .padding(.top, 2)
@@ -120,7 +120,7 @@ struct MenuBarContentView: View {
                         .foregroundColor(.red)
                         .lineLimit(2)
                     Spacer()
-                    Button("Dismiss") {
+                    Button("menu.dismiss") {
                         controller.dismissError()
                     }
                     .font(.caption)
@@ -131,14 +131,14 @@ struct MenuBarContentView: View {
             
             // Bottom actions
             HStack {
-                Button("Settings…") {
+                Button("menu.settings") {
                     openSettings()
                 }
                 .font(.caption)
                 
                 Spacer()
                 
-                Button("Quit") {
+                Button("menu.quit") {
                     NSApplication.shared.terminate(nil)
                 }
                 .font(.caption)

@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import AVFoundation
 
 @MainActor
 final class AppController: ObservableObject {
@@ -18,6 +19,7 @@ final class AppController: ObservableObject {
     private var currentRecordingURL: URL?
     private let floatingPanel = FloatingPanel()
     private var hideTask: Task<Void, Never>?
+    private let speechSynthesizer = AVSpeechSynthesizer()
     
     init() {
         let loaded = SettingsStore().load()
@@ -168,6 +170,10 @@ final class AppController: ObservableObject {
                 NSPasteboard.general.setString(finalText, forType: .string)
             }
             
+            if settings.readAloudEnabled {
+                readAloud(finalText)
+            }
+            
             status = .idle
             scheduleHidePanel()
             
@@ -178,6 +184,14 @@ final class AppController: ObservableObject {
         
         // Cleanup recording file
         try? FileManager.default.removeItem(at: url)
+    }
+    
+    private func readAloud(_ text: String) {
+        speechSynthesizer.stopSpeaking(at: .immediate)
+        let utterance = AVSpeechUtterance(string: text)
+        utterance.voice = AVSpeechSynthesisVoice(language: settings.sourceLanguage)
+        utterance.rate = AVSpeechUtteranceDefaultSpeechRate
+        speechSynthesizer.speak(utterance)
     }
     
     private func scheduleHidePanel() {

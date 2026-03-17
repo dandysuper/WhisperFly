@@ -1,0 +1,70 @@
+/* Pipeline status */
+"status.ready" = "Ready";
+"status.recording" = "Recording…";
+"status.transcribing" = "Transcribing…";
+"status.rewriting" = "Rewriting…";
+"status.pasting" = "Pasting…";
+"status.error" = "Error: %@";
+
+/* Floating status view */
+"floating.listening" = "Listening…";
+"floating.transcribing" = "Transcribing…";
+"floating.rewriting" = "Rewriting…";
+"floating.done" = "Done ✓";
+
+/* Menu bar */
+"menu.start_recording" = "Start Recording";
+"menu.stop_recording" = "Stop Recording";
+"menu.settings" = "Settings…";
+"menu.quit" = "Quit";
+"menu.api_keys_missing" = "API keys not configured";
+"menu.backend" = "Backend:";
+"menu.rewrite" = "Rewrite:";
+"menu.last_latency" = "Last latency:";
+"menu.transcription" = "Transcription";
+"menu.last_result" = "Last Result";
+"menu.raw" = "Raw:";
+"menu.rewritten" = "Rewritten:";
+"menu.dismiss" = "Dismiss";
+
+/* Settings – tabs */
+"settings.tab.general" = "General";
+"settings.tab.api_keys" = "API Keys";
+"settings.tab.advanced" = "Advanced";
+
+/* Settings – general */
+"settings.transcription_backend" = "Transcription Backend";
+"settings.source_language" = "Source Language";
+"settings.enable_rewriting" = "Enable Gemini Rewriting";
+"settings.rewrite_mode" = "Rewrite Mode";
+"settings.hotkey" = "Hotkey";
+"settings.read_aloud" = "Read Aloud After Pasting";
+
+/* Settings – languages */
+"lang.ru" = "Russian";
+"lang.en" = "English";
+"lang.de" = "German";
+"lang.fr" = "French";
+"lang.es" = "Spanish";
+"lang.ja" = "Japanese";
+"lang.zh" = "Chinese";
+"lang.ko" = "Korean";
+"lang.it" = "Italian";
+"lang.hi" = "Hindi";
+
+/* Settings – API keys */
+"settings.groq_section" = "Groq (Whisper ASR)";
+"settings.openrouter_section" = "OpenRouter (Gemini Flash)";
+"settings.api_key" = "API Key";
+"settings.groq_hint" = "Get free key at console.groq.com";
+"settings.openrouter_hint" = "Get free key at openrouter.ai";
+"settings.key_configured" = "Key configured";
+
+/* Settings – advanced */
+"settings.max_recording" = "Max Recording: %ds";
+"settings.paste_delay" = "Paste Delay: %dms";
+
+/* Rewrite modes */
+"rewrite.cleanup" = "Cleanup";
+"rewrite.punctuate" = "Punctuate";
+"rewrite.translate" = "Translate to English";

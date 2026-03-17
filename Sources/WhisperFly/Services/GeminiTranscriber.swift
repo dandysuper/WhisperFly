@@ -14,7 +14,10 @@ actor GeminiTranscriber: SpeechRecognizer {
     func transcribe(audioURL: URL) async throws -> TranscriptionResultPayload {
         let start = CFAbsoluteTimeGetCurrent()
         
-        let audioData = try Data(contentsOf: audioURL)
+        let wavURL = try AudioConverter.convertToWAV(audioURL)
+        defer { try? FileManager.default.removeItem(at: wavURL) }
+        
+        let audioData = try Data(contentsOf: wavURL)
         let base64Audio = audioData.base64EncodedString()
         
         let systemPrompt = "You are a speech transcription assistant. Transcribe the audio exactly as spoken. The audio is likely in \(language). Output ONLY the transcribed text, nothing else. No explanations, no formatting, no quotes."

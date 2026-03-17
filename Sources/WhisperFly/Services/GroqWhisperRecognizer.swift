@@ -1,5 +1,4 @@
 import Foundation
-import AVFoundation
 
 actor GroqWhisperRecognizer: SpeechRecognizer {
     private let apiKey: String
@@ -15,7 +14,7 @@ actor GroqWhisperRecognizer: SpeechRecognizer {
     func transcribe(audioURL: URL) async throws -> TranscriptionResultPayload {
         let start = CFAbsoluteTimeGetCurrent()
         
-        let wavURL = try convertToWAV(audioURL)
+        let wavURL = try AudioConverter.convertToWAV(audioURL)
         defer { try? FileManager.default.removeItem(at: wavURL) }
         
         let audioData = try Data(contentsOf: wavURL)
@@ -67,33 +66,4 @@ actor GroqWhisperRecognizer: SpeechRecognizer {
         return TranscriptionResultPayload(text: text.trimmingCharacters(in: .whitespacesAndNewlines), latency: latency, audioURL: audioURL)
     }
     
-    private func convertToWAV(_ cafURL: URL) throws -> URL {
-        let wavURL = cafURL.deletingPathExtension().appendingPathExtension("wav")
-        let inputFile = try AVAudioFile(forReading: cafURL)
-        let targetFormat = AVAudioFormat(commonFormat: .pcmFormatInt16, sampleRate: 16000, channels: 1, interleaved: true)!
-        
-        let frameCount = AVAudioFrameCount(inputFile.length)
-        guard let inputBuffer = AVAudioPCMBuffer(pcmFormat: inputFile.processingFormat, frameCapacity: frameCount) else {
-            throw NSError(domain: "WhisperFly", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to create input buffer"])
-        }
-        try inputFile.read(into: inputBuffer)
-        
-        let outputBuffer: AVAudioPCMBuffer
-        if inputFile.processingFormat == targetFormat {
-            outputBuffer = inputBuffer
-        } else {
-            guard let converter = AVAudioConverter(from: inputFile.processingFormat, to: targetFormat) else {
-                throw NSError(domain: "WhisperFly", code: 3, userInfo: [NSLocalizedDescriptionKey: "Audio format conversion not possible"])
-            }
-            guard let converted = AVAudioPCMBuffer(pcmFormat: targetFormat, frameCapacity: frameCount) else {
-                throw NSError(domain: "WhisperFly", code: 4, userInfo: [NSLocalizedDescriptionKey: "Failed to create output buffer"])
-            }
-            try converter.convert(to: converted, from: inputBuffer)
-            outputBuffer = converted
-        }
-        
-        let outputFile = try AVAudioFile(forWriting: wavURL, settings: targetFormat.settings, commonFormat: .pcmFormatInt16, interleaved: true)
-        try outputFile.write(from: outputBuffer)
-        return wavURL
-    }
 }

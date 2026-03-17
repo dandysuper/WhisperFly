@@ -4,6 +4,7 @@ struct AppSettings: Codable, Sendable, Equatable {
     enum TranscriptionBackend: String, Codable, Sendable, CaseIterable {
         case groqWhisper = "Groq Whisper (Free)"
         case gemini = "Gemini 2.5 Flash (OpenRouter)"
+        // NIM Canary backend removed — use groqWhisper or gemini
     }
     
     enum HotkeyPreset: String, Codable, Sendable, CaseIterable {
@@ -22,6 +23,7 @@ struct AppSettings: Codable, Sendable, Equatable {
     var sourceLanguage: String = "ru"
     var targetLanguage: String = "en"
     var customSystemPrompt: String = ""
+    var readAloudEnabled: Bool = false
     
     static let defaults = AppSettings()
 }

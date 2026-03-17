@@ -3,12 +3,15 @@ import PackageDescription
 
 let package = Package(
     name: "WhisperFly",
+    defaultLocalization: "en",
     platforms: [.macOS(.v14)],
     targets: [
         .executableTarget(
             name: "WhisperFly",
             path: "Sources/WhisperFly",
-            resources: [.copy("Resources")]
+            resources: [
+                .process("Resources")
+            ]
         ),
         .testTarget(
             name: "WhisperFlyTests",

@@ -1,0 +1,70 @@
+/* Pipeline status */
+"status.ready" = "Готов";
+"status.recording" = "Запись…";
+"status.transcribing" = "Транскрибирование…";
+"status.rewriting" = "Переформулировка…";
+"status.pasting" = "Вставка…";
+"status.error" = "Ошибка: %@";
+
+/* Floating status view */
+"floating.listening" = "Слушаю…";
+"floating.transcribing" = "Транскрибирую…";
+"floating.rewriting" = "Переформулирую…";
+"floating.done" = "Готово ✓";
+
+/* Menu bar */
+"menu.start_recording" = "Начать запись";
+"menu.stop_recording" = "Остановить запись";
+"menu.settings" = "Настройки…";
+"menu.quit" = "Выход";
+"menu.api_keys_missing" = "API-ключи не настроены";
+"menu.backend" = "Бэкенд:";
+"menu.rewrite" = "Переформулировка:";
+"menu.last_latency" = "Последняя задержка:";
+"menu.transcription" = "Транскрипция";
+"menu.last_result" = "Последний результат";
+"menu.raw" = "Сырой текст:";
+"menu.rewritten" = "Переформулировано:";
+"menu.dismiss" = "Закрыть";
+
+/* Settings – tabs */
+"settings.tab.general" = "Основные";
+"settings.tab.api_keys" = "API-ключи";
+"settings.tab.advanced" = "Дополнительно";
+
+/* Settings – general */
+"settings.transcription_backend" = "Бэкенд транскрипции";
+"settings.source_language" = "Язык записи";
+"settings.enable_rewriting" = "Включить переформулировку (Gemini)";
+"settings.rewrite_mode" = "Режим переформулировки";
+"settings.hotkey" = "Горячая клавиша";
+"settings.read_aloud" = "Прочитать вслух после вставки";
+
+/* Settings – languages */
+"lang.ru" = "Русский";
+"lang.en" = "Английский";
+"lang.de" = "Немецкий";
+"lang.fr" = "Французский";
+"lang.es" = "Испанский";
+"lang.ja" = "Японский";
+"lang.zh" = "Китайский";
+"lang.ko" = "Корейский";
+"lang.it" = "Итальянский";
+"lang.hi" = "Хинди";
+
+/* Settings – API keys */
+"settings.groq_section" = "Groq (Whisper ASR)";
+"settings.openrouter_section" = "OpenRouter (Gemini Flash)";
+"settings.api_key" = "API-ключ";
+"settings.groq_hint" = "Получите бесплатный ключ на console.groq.com";
+"settings.openrouter_hint" = "Получите бесплатный ключ на openrouter.ai";
+"settings.key_configured" = "Ключ настроен";
+
+/* Settings – advanced */
+"settings.max_recording" = "Макс. запись: %d сек";
+"settings.paste_delay" = "Задержка вставки: %d мс";
+
+/* Rewrite modes */
+"rewrite.cleanup" = "Исправление";
+"rewrite.punctuate" = "Пунктуация";
+"rewrite.translate" = "Перевод на английский";

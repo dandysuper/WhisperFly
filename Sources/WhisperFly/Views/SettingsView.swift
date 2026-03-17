@@ -6,52 +6,54 @@ struct SettingsView: View {
     var body: some View {
         TabView {
             generalTab
-                .tabItem { Label("General", systemImage: "gear") }
+                .tabItem { Label("settings.tab.general", systemImage: "gear") }
             apiTab
-                .tabItem { Label("API Keys", systemImage: "key") }
+                .tabItem { Label("settings.tab.api_keys", systemImage: "key") }
             advancedTab
-                .tabItem { Label("Advanced", systemImage: "slider.horizontal.3") }
+                .tabItem { Label("settings.tab.advanced", systemImage: "slider.horizontal.3") }
         }
         .padding(20)
-        .frame(width: 480, height: 380)
+        .frame(width: 480, height: 400)
     }
     
     private var generalTab: some View {
         Form {
-            Picker("Transcription Backend", selection: $controller.settings.transcriptionBackend) {
+            Picker("settings.transcription_backend", selection: $controller.settings.transcriptionBackend) {
                 ForEach(AppSettings.TranscriptionBackend.allCases, id: \.self) { backend in
                     Text(backend.rawValue).tag(backend)
                 }
             }
             
-            Picker("Source Language", selection: $controller.settings.sourceLanguage) {
-                Text("Russian").tag("ru")
-                Text("English").tag("en")
-                Text("German").tag("de")
-                Text("French").tag("fr")
-                Text("Spanish").tag("es")
-                Text("Japanese").tag("ja")
-                Text("Chinese").tag("zh")
-                Text("Korean").tag("ko")
-                Text("Italian").tag("it")
-                Text("Hindi").tag("hi")
+            Picker("settings.source_language", selection: $controller.settings.sourceLanguage) {
+                Text("lang.ru").tag("ru")
+                Text("lang.en").tag("en")
+                Text("lang.de").tag("de")
+                Text("lang.fr").tag("fr")
+                Text("lang.es").tag("es")
+                Text("lang.ja").tag("ja")
+                Text("lang.zh").tag("zh")
+                Text("lang.ko").tag("ko")
+                Text("lang.it").tag("it")
+                Text("lang.hi").tag("hi")
             }
             
-            Toggle("Enable Gemini Rewriting", isOn: $controller.settings.geminiRewriteEnabled)
+            Toggle("settings.enable_rewriting", isOn: $controller.settings.geminiRewriteEnabled)
             
             if controller.settings.geminiRewriteEnabled {
-                Picker("Rewrite Mode", selection: $controller.settings.rewriteMode) {
+                Picker("settings.rewrite_mode", selection: $controller.settings.rewriteMode) {
                     ForEach(RewriteMode.allCases, id: \.self) { mode in
-                        Text(mode.rawValue).tag(mode)
+                        Text(mode.localizedName).tag(mode)
                     }
                 }
             }
             
-            Picker("Hotkey", selection: $controller.settings.hotkey) {
+            Picker("settings.hotkey", selection: $controller.settings.hotkey) {
                 ForEach(AppSettings.HotkeyPreset.allCases, id: \.self) { preset in
                     Text(preset.rawValue).tag(preset)
                 }
             }
+            
+            Toggle("settings.read_aloud", isOn: $controller.settings.readAloudEnabled)
         }
         .onChange(of: controller.settings) { _, _ in
             controller.saveSettings()
@@ -60,29 +62,29 @@ struct SettingsView: View {
     
     private var apiTab: some View {
         Form {
-            Section("Groq (Whisper ASR)") {
-                SecureField("API Key", text: $controller.settings.groqApiKey)
+            Section(String(localized: "settings.groq_section", defaultValue: "Groq (Whisper ASR)")) {
+                SecureField("settings.api_key", text: $controller.settings.groqApiKey)
                     .textFieldStyle(.roundedBorder)
                 if controller.settings.groqApiKey.isEmpty {
-                    Text("Get free key at console.groq.com")
+                    Text("settings.groq_hint")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {
-                    Label("Key configured", systemImage: "checkmark.circle.fill")
+                    Label("settings.key_configured", systemImage: "checkmark.circle.fill")
                         .font(.caption)
                         .foregroundColor(.green)
                 }
             }
             
-            Section("OpenRouter (Gemini Flash)") {
-                SecureField("API Key", text: $controller.settings.openRouterApiKey)
+            Section(String(localized: "settings.openrouter_section", defaultValue: "OpenRouter (Gemini Flash)")) {
+                SecureField("settings.api_key", text: $controller.settings.openRouterApiKey)
                     .textFieldStyle(.roundedBorder)
                 if controller.settings.openRouterApiKey.isEmpty {
-                    Text("Get free key at openrouter.ai")
+                    Text("settings.openrouter_hint")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 } else {
-                    Label("Key configured", systemImage: "checkmark.circle.fill")
+                    Label("settings.key_configured", systemImage: "checkmark.circle.fill")
                         .font(.caption)
                         .foregroundColor(.green)
                 }
@@ -95,13 +97,17 @@ struct SettingsView: View {
     
     private var advancedTab: some View {
         Form {
-            Stepper("Max Recording: \(controller.settings.maxRecordingSeconds)s",
-                    value: $controller.settings.maxRecordingSeconds,
-                    in: 10...300, step: 10)
+            Stepper(
+                String(format: NSLocalizedString("settings.max_recording", value: "Max Recording: %ds", comment: ""), controller.settings.maxRecordingSeconds),
+                value: $controller.settings.maxRecordingSeconds,
+                in: 10...300, step: 10
+            )
             
-            Stepper("Paste Delay: \(controller.settings.pasteDelayMs)ms",
-                    value: $controller.settings.pasteDelayMs,
-                    in: 50...500, step: 25)
+            Stepper(
+                String(format: NSLocalizedString("settings.paste_delay", value: "Paste Delay: %dms", comment: ""), controller.settings.pasteDelayMs),
+                value: $controller.settings.pasteDelayMs,
+                in: 50...500, step: 25
+            )
         }
         .onChange(of: controller.settings) { _, _ in
             controller.saveSettings()

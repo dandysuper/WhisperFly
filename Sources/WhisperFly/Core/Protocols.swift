@@ -21,6 +21,14 @@ enum RewriteMode: String, Codable, Sendable, CaseIterable {
     case cleanup = "Cleanup"
     case punctuate = "Punctuate"
     case translate = "Translate to English"
+    
+    var localizedName: String {
+        switch self {
+        case .cleanup: return String(localized: "rewrite.cleanup", defaultValue: "Cleanup")
+        case .punctuate: return String(localized: "rewrite.punctuate", defaultValue: "Punctuate")
+        case .translate: return String(localized: "rewrite.translate", defaultValue: "Translate to English")
+        }
+    }
 }
 
 protocol SpeechRecognizer: Sendable {
