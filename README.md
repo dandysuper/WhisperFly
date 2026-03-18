@@ -21,25 +21,40 @@ Fork of [qwenwishper](https://github.com/hukopo/qwenwishper) — replaces all lo
 - **Localized UI** — the app automatically adapts to your system language (English, Russian, German, French, Spanish, Japanese, Chinese, Korean, Italian, Hindi)
 - No local model downloads, no GPU required
 
-### Setup
+### Install
+
+**Option 1 — Homebrew (recommended):**
+```bash
+brew tap dandysuper/tap
+brew install --cask whisperfly
+```
+
+**Option 2 — Download DMG:**  
+Grab `WhisperFly.dmg` from the [latest release](https://github.com/dandysuper/WhisperFly/releases/latest), open it, and drag the app to `/Applications`.
+
+**Option 3 — Build from source:**
+```bash
+git clone https://github.com/dandysuper/WhisperFly.git
+cd WhisperFly
+swift run WhisperFly
+```
+
+### Configure
 
 1. Get free API keys:
    - Groq: [console.groq.com](https://console.groq.com) → API Keys
    - OpenRouter: [openrouter.ai/keys](https://openrouter.ai/keys)
 
-2. Create `.env` in the project root:
+2. Open **Settings → API Keys** in the app and paste them in.
+
+   *(Building from source? Create `.env` in the project root instead:*
    ```
    GROQ_API_KEY=gsk_xxx
    OPENROUTER_API_KEY=sk-or-v1-xxx
    ```
+   *)*
 
-3. Build & run:
-   ```bash
-   swift build
-   swift run WhisperFly
-   ```
-
-4. Grant **Microphone** and **Accessibility** permissions when prompted.
+3. Grant **Microphone** and **Accessibility** permissions when prompted.
 
 ### Usage
 
@@ -60,25 +75,15 @@ Fork of [qwenwishper](https://github.com/hukopo/qwenwishper) — replaces all lo
 
 ### Removing macOS Quarantine (xattr)
 
-macOS marks apps downloaded from the internet with a quarantine flag, which can trigger **"app is damaged"** or **Gatekeeper blocked** warnings. To remove this flag, run the following command in Terminal:
+> **Not needed if you installed via Homebrew** — Homebrew removes the quarantine flag automatically.
+
+If you installed manually from the DMG, macOS may block the app with an **"app is damaged"** or Gatekeeper warning. Fix it by running:
 
 ```bash
 xattr -cr /Applications/WhisperFly.app
 ```
 
-**What it does:**
-- `xattr` — manipulates extended attributes on files and directories
-- `-c` — **clears** all extended attributes (including `com.apple.quarantine`)
-- `-r` — applies **recursively** to all files inside the `.app` bundle
-
-**Step-by-step:**
-1. Move `WhisperFly.app` to `/Applications` (or wherever you keep it)
-2. Open **Terminal** (`⌘Space` → type *Terminal*)
-3. Run the command above (adjust path if the app is elsewhere, e.g. `~/Desktop/WhisperFly.app`)
-4. Launch the app normally
-
-> **Why is this needed?**  
-> Apple's Gatekeeper quarantines any app not signed with an Apple Developer certificate or notarized through Apple. The `xattr -cr` command is the standard developer workaround for unsigned/self-built apps.
+This clears the `com.apple.quarantine` extended attribute recursively from the app bundle. Apple's Gatekeeper applies this flag to any app not signed with an Apple Developer certificate.
 
 ### Architecture
 
@@ -131,23 +136,38 @@ Sources/WhisperFly/
 
 ### Установка
 
+**Вариант 1 — Homebrew (рекомендуется):**
+```bash
+brew tap dandysuper/tap
+brew install --cask whisperfly
+```
+
+**Вариант 2 — Скачать DMG:**  
+Скачайте `WhisperFly.dmg` с [последнего релиза](https://github.com/dandysuper/WhisperFly/releases/latest), откройте и перетащите приложение в `/Applications`.
+
+**Вариант 3 — Собрать из исходников:**
+```bash
+git clone https://github.com/dandysuper/WhisperFly.git
+cd WhisperFly
+swift run WhisperFly
+```
+
+### Настройка
+
 1. Получите бесплатные API-ключи:
    - Groq: [console.groq.com](https://console.groq.com) → API Keys
    - OpenRouter: [openrouter.ai/keys](https://openrouter.ai/keys)
 
-2. Создайте файл `.env` в корне проекта:
+2. Откройте **Настройки → API-ключи** в приложении и вставьте их.
+
+   *(При сборке из исходников создайте `.env` в корне проекта:*
    ```
    GROQ_API_KEY=gsk_xxx
    OPENROUTER_API_KEY=sk-or-v1-xxx
    ```
+   *)*
 
-3. Соберите и запустите:
-   ```bash
-   swift build
-   swift run WhisperFly
-   ```
-
-4. Разрешите доступ к **Микрофону** и **Специальным возможностям** при запросе.
+3. Разрешите доступ к **Микрофону** и **Специальным возможностям** при запросе.
 
 ### Использование
 
@@ -168,25 +188,15 @@ Sources/WhisperFly/
 
 ### Снятие карантина macOS (xattr)
 
-macOS помечает приложения, загруженные из интернета, флагом карантина, что может вызвать предупреждение **«приложение повреждено»** или блокировку Gatekeeper. Чтобы снять этот флаг, выполните команду в Терминале:
+> **Не нужно при установке через Homebrew** — Homebrew снимает флаг карантина автоматически.
+
+Если вы установили приложение вручную из DMG, macOS может заблокировать его с предупреждением **«приложение повреждено»** или от Gatekeeper. Исправьте, выполнив:
 
 ```bash
 xattr -cr /Applications/WhisperFly.app
 ```
 
-**Что делает команда:**
-- `xattr` — управляет расширенными атрибутами файлов и папок
-- `-c` — **очищает** все расширенные атрибуты (включая `com.apple.quarantine`)
-- `-r` — применяет операцию **рекурсивно** ко всем файлам внутри `.app`
-
-**Пошаговая инструкция:**
-1. Переместите `WhisperFly.app` в `/Applications` (или в другое удобное место)
-2. Откройте **Терминал** (`⌘Space` → введите *Терминал*)
-3. Выполните команду выше (при необходимости замените путь, например `~/Desktop/WhisperFly.app`)
-4. Запустите приложение обычным способом
-
-> **Почему это нужно?**  
-> Gatekeeper Apple помечает карантином любое приложение, не подписанное сертификатом Apple Developer и не нотаризованное Apple. Команда `xattr -cr` — стандартный обходной путь для неподписанных / самостоятельно собранных приложений.
+Это рекурсивно удаляет атрибут `com.apple.quarantine` из пакета приложения. Gatekeeper Apple устанавливает этот флаг на любое приложение, не подписанное сертификатом Apple Developer.
 
 ### Архитектура
 
