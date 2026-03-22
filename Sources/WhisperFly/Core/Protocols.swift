@@ -40,7 +40,7 @@ protocol TextRewriter: Sendable {
 }
 
 protocol TextInjector: Sendable {
-    func insert(text: String) throws -> InsertResult
+    func insert(text: String, targetPID: pid_t?) throws -> InsertResult
 }
 
 protocol AudioCapturing: Sendable {

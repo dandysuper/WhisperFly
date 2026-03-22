@@ -17,7 +17,7 @@ struct AppSettings: Codable, Sendable, Equatable {
     var rewriteMode: RewriteMode = .cleanup
     var hotkey: HotkeyPreset = .cmdShiftSpace
     var maxRecordingSeconds: Int = 120
-    var pasteDelayMs: Int = 100
+    var pasteDelayMs: Int = 120
     var groqApiKey: String = ""
     var openRouterApiKey: String = ""
     /// Supported source languages: en, ru, de, fr, es, ja, zh, ko, it, hi

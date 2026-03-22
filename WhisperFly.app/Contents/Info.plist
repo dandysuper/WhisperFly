@@ -11,9 +11,9 @@
     <key>CFBundleDisplayName</key>
     <string>WhisperFly</string>
     <key>CFBundleVersion</key>
-    <string>1</string>
+    <string>2</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.0</string>
+    <string>1.0.1</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>
@@ -26,6 +26,8 @@
     <true/>
     <key>NSMicrophoneUsageDescription</key>
     <string>WhisperFly needs microphone access to transcribe your speech.</string>
+    <key>NSAccessibilityUsageDescription</key>
+    <string>WhisperFly needs Accessibility access to type transcribed text into the focused input field.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>LSApplicationCategoryType</key>

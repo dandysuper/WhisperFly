@@ -20,6 +20,33 @@ struct MenuBarContentView: View {
                 }
             }
             
+            // Accessibility warning
+            if !controller.accessibilityGranted {
+                HStack(spacing: 6) {
+                    Image(systemName: "lock.shield.fill")
+                        .foregroundColor(.orange)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(L("menu.accessibility_required", "Accessibility permission required"))
+                            .font(.caption)
+                            .fontWeight(.medium)
+                        Text(L("menu.accessibility_hint", "Needed to type text into apps"))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Button(L("menu.grant", "Grant")) {
+                        controller.checkAccessibilityPermission()
+                        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!)
+                    }
+                    .font(.caption)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.orange)
+                }
+                .padding(8)
+                .background(Color.orange.opacity(0.1))
+                .cornerRadius(6)
+            }
+            
             Divider()
             
             // Record Button
@@ -146,6 +173,9 @@ struct MenuBarContentView: View {
         }
         .padding(12)
         .frame(width: 320)
+        .onAppear {
+            controller.refreshAccessibility()
+        }
     }
     
     private var statusColor: Color {
