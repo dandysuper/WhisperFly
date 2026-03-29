@@ -85,6 +85,22 @@ xattr -cr /Applications/WhisperFly.app
 
 This clears the `com.apple.quarantine` extended attribute recursively from the app bundle. Apple's Gatekeeper applies this flag to any app not signed with an Apple Developer certificate.
 
+### Reinstalling / Updating
+
+When you reinstall or update WhisperFly, macOS **does not** automatically trust the new binary for Accessibility. The old entry becomes stale and the app will silently fail to paste text.
+
+**You must remove and re-add WhisperFly in Accessibility settings:**
+
+1. **Quit** WhisperFly if it's running.
+2. Install the new version (Homebrew `brew upgrade whisperfly`, or drag the new `.app` to `/Applications`).
+3. Open **System Settings → Privacy & Security → Accessibility**.
+4. Find **WhisperFly** in the list — **select it and click the "−" (minus) button** to remove it entirely.
+5. Click **"+" (plus)**, navigate to `/Applications/WhisperFly.app`, and add it back.
+6. Make sure the toggle is **on**.
+7. Launch WhisperFly.
+
+> **Why?** macOS ties Accessibility permissions to the app's code signature / binary hash. After an update the old permission entry points to a binary that no longer matches, so the system revokes access silently. Toggling the switch off/on is **not enough** — you must fully remove and re-add the entry.
+
 ### Architecture
 
 ```
@@ -197,6 +213,22 @@ xattr -cr /Applications/WhisperFly.app
 ```
 
 Это рекурсивно удаляет атрибут `com.apple.quarantine` из пакета приложения. Gatekeeper Apple устанавливает этот флаг на любое приложение, не подписанное сертификатом Apple Developer.
+
+### Переустановка / Обновление
+
+При переустановке или обновлении WhisperFly macOS **не** доверяет новому бинарнику автоматически для Специальных возможностей (Accessibility). Старая запись становится недействительной, и приложение молча перестаёт вставлять текст.
+
+**Необходимо удалить и заново добавить WhisperFly в настройках Accessibility:**
+
+1. **Закройте** WhisperFly, если он запущен.
+2. Установите новую версию (Homebrew: `brew upgrade whisperfly`, или перетащите новый `.app` в `/Applications`).
+3. Откройте **Системные настройки → Конфиденциальность и безопасность → Специальные возможности** (Accessibility).
+4. Найдите **WhisperFly** в списке — **выделите его и нажмите кнопку «−» (минус)**, чтобы полностью удалить.
+5. Нажмите **«+» (плюс)**, перейдите к `/Applications/WhisperFly.app` и добавьте его заново.
+6. Убедитесь, что переключатель **включён**.
+7. Запустите WhisperFly.
+
+> **Почему?** macOS привязывает разрешения Accessibility к подписи / хешу бинарника приложения. После обновления старая запись ссылается на бинарник, который больше не совпадает, и система молча отзывает доступ. Переключение тумблера выкл/вкл **недостаточно** — нужно полностью удалить и заново добавить запись.
 
 ### Архитектура
 
