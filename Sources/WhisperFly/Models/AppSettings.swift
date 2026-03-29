@@ -20,6 +20,7 @@ struct AppSettings: Codable, Sendable, Equatable {
     var pasteDelayMs: Int = 120
     var groqApiKey: String = ""
     var openRouterApiKey: String = ""
+    var openRouterModel: String = "google/gemini-2.5-flash"
     /// Supported source languages: en, ru, de, fr, es, ja, zh, ko, it, hi
     var sourceLanguage: String = "en"
     var targetLanguage: String = "en"

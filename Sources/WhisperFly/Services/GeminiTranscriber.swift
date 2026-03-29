@@ -4,11 +4,12 @@ actor GeminiTranscriber: SpeechRecognizer {
     private let apiKey: String
     private let language: String
     private let endpoint = URL(string: "https://openrouter.ai/api/v1/chat/completions")!
-    private let model = "google/gemini-2.5-flash-preview-05-20:free"
+    private let model: String
     
-    init(apiKey: String, language: String = "ru") {
+    init(apiKey: String, language: String = "ru", model: String = "google/gemini-2.5-flash") {
         self.apiKey = apiKey
         self.language = language
+        self.model = model
     }
     
     func transcribe(audioURL: URL) async throws -> TranscriptionResultPayload {

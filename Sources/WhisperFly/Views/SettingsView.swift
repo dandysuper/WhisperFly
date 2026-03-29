@@ -108,6 +108,14 @@ struct SettingsView: View {
                 value: $controller.settings.pasteDelayMs,
                 in: 50...500, step: 25
             )
+            
+            Section(L("settings.openrouter_model_section", "OpenRouter Model")) {
+                TextField(L("settings.openrouter_model", "Model ID"), text: $controller.settings.openRouterModel)
+                    .textFieldStyle(.roundedBorder)
+                Text(L("settings.openrouter_model_hint", "Default: google/gemini-2.5-flash"))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
         }
         .onChange(of: controller.settings) { _, _ in
             controller.saveSettings()

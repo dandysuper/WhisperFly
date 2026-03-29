@@ -210,7 +210,7 @@ final class AppController: ObservableObject {
             if settings.geminiRewriteEnabled, !settings.openRouterApiKey.isEmpty {
                 status = .rewriting
                 do {
-                    let rewriter = GeminiRewriter(apiKey: settings.openRouterApiKey)
+                    let rewriter = GeminiRewriter(apiKey: settings.openRouterApiKey, model: settings.openRouterModel)
                     let rewriteResult = try await rewriter.rewrite(
                         inputText: result.text,
                         locale: Locale.current,
@@ -298,7 +298,7 @@ final class AppController: ObservableObject {
         case .groqWhisper:
             return GroqWhisperRecognizer(apiKey: settings.groqApiKey, language: settings.sourceLanguage)
         case .gemini:
-            return GeminiTranscriber(apiKey: settings.openRouterApiKey, language: settings.sourceLanguage)
+            return GeminiTranscriber(apiKey: settings.openRouterApiKey, language: settings.sourceLanguage, model: settings.openRouterModel)
         }
     }
     
