@@ -81,3 +81,25 @@
 "menu.transcribe_file" = "Transcribir archivo…";
 "file.pick_title" = "Seleccionar archivo de audio o video";
 "error.no_speech" = "No se detectó voz";
+
+/* History */
+"menu.history" = "Historial";
+"history.title" = "Historial";
+"history.clear" = "Borrar todo";
+"history.empty" = "Sin transcripciones aún";
+"history.source.mic" = "Micrófono";
+"history.source.system" = "Audio del sistema";
+"history.source.file" = "Archivo";
+"history.copy_tooltip" = "Copiar al portapapeles";
+
+/* Result window */
+"result.title.mic" = "Transcripción";
+"result.title.system" = "Transcripción de audio del sistema";
+"result.title.file" = "Transcripción de archivo";
+"result.copy" = "Copiar";
+"result.copied" = "Copiado ✓";
+"result.chars" = "caracteres";
+
+/* Screen Recording permission */
+"menu.screen_recording_required" = "Permiso de grabación de pantalla requerido";
+"menu.screen_recording_hint" = "Necesario para capturar audio del sistema";

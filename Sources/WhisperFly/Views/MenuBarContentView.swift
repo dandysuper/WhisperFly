@@ -47,6 +47,32 @@ struct MenuBarContentView: View {
                 .cornerRadius(6)
             }
             
+            // Screen Recording warning (only when system audio is selected)
+            if controller.settings.audioSource == .systemAudio && !controller.screenRecordingGranted {
+                HStack(spacing: 6) {
+                    Image(systemName: "rectangle.dashed.badge.record")
+                        .foregroundColor(.purple)
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(L("menu.screen_recording_required", "Screen Recording permission required"))
+                            .font(.caption)
+                            .fontWeight(.medium)
+                        Text(L("menu.screen_recording_hint", "Needed to capture system audio"))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Button(L("menu.grant", "Grant")) {
+                        controller.requestScreenRecordingPermission()
+                    }
+                    .font(.caption)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.purple)
+                }
+                .padding(8)
+                .background(Color.purple.opacity(0.1))
+                .cornerRadius(6)
+            }
+            
             Divider()
             
             // Audio Source Picker
@@ -99,6 +125,29 @@ struct MenuBarContentView: View {
             }
             .buttonStyle(.bordered)
             .disabled(!controller.hasValidAPIKeys || controller.status != .idle)
+            
+            // History Button
+            Button(action: {
+                controller.showHistory()
+            }) {
+                HStack {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.title2)
+                    Text(L("menu.history", "History"))
+                    if !controller.history.entries.isEmpty {
+                        Spacer()
+                        Text("\(controller.history.entries.count)")
+                            .font(.caption2)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.secondary.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 4)
+            }
+            .buttonStyle(.bordered)
             
             // Audio Level Meter
             if controller.status == .recording {
@@ -206,6 +255,7 @@ struct MenuBarContentView: View {
         .frame(width: 320)
         .onAppear {
             controller.refreshAccessibility()
+            controller.checkScreenRecordingPermission()
         }
     }
     

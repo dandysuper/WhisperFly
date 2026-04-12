@@ -81,3 +81,25 @@
 "menu.transcribe_file" = "फ़ाइल ट्रांसक्राइब करें…";
 "file.pick_title" = "ऑडियो या वीडियो फ़ाइल चुनें";
 "error.no_speech" = "कोई भाषण नहीं मिला";
+
+/* History */
+"menu.history" = "इतिहास";
+"history.title" = "इतिहास";
+"history.clear" = "सभी हटाएं";
+"history.empty" = "अभी तक कोई ट्रांसक्रिप्शन नहीं";
+"history.source.mic" = "माइक्रोफ़ोन";
+"history.source.system" = "सिस्टम ऑडियो";
+"history.source.file" = "फ़ाइल";
+"history.copy_tooltip" = "क्लिपबोर्ड पर कॉपी करें";
+
+/* Result window */
+"result.title.mic" = "ट्रांसक्रिप्शन";
+"result.title.system" = "सिस्टम ऑडियो ट्रांसक्रिप्शन";
+"result.title.file" = "फ़ाइल ट्रांसक्रिप्शन";
+"result.copy" = "कॉपी करें";
+"result.copied" = "कॉपी हो गया ✓";
+"result.chars" = "अक्षर";
+
+/* Screen Recording permission */
+"menu.screen_recording_required" = "स्क्रीन रिकॉर्डिंग अनुमति आवश्यक";
+"menu.screen_recording_hint" = "सिस्टम ऑडियो कैप्चर के लिए आवश्यक";

@@ -81,3 +81,25 @@
 "menu.transcribe_file" = "ファイルを文字起こし…";
 "file.pick_title" = "音声または動画ファイルを選択";
 "error.no_speech" = "音声が検出されませんでした";
+
+/* History */
+"menu.history" = "履歴";
+"history.title" = "履歴";
+"history.clear" = "すべて消去";
+"history.empty" = "文字起こしはまだありません";
+"history.source.mic" = "マイク";
+"history.source.system" = "システムオーディオ";
+"history.source.file" = "ファイル";
+"history.copy_tooltip" = "クリップボードにコピー";
+
+/* Result window */
+"result.title.mic" = "文字起こし";
+"result.title.system" = "システムオーディオ文字起こし";
+"result.title.file" = "ファイル文字起こし";
+"result.copy" = "コピー";
+"result.copied" = "コピー済み ✓";
+"result.chars" = "文字";
+
+/* Screen Recording permission */
+"menu.screen_recording_required" = "画面収録の許可が必要です";
+"menu.screen_recording_hint" = "システムオーディオのキャプチャに必要";

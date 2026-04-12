@@ -81,3 +81,25 @@
 "menu.transcribe_file" = "파일 전사…";
 "file.pick_title" = "오디오 또는 비디오 파일 선택";
 "error.no_speech" = "음성이 감지되지 않음";
+
+/* History */
+"menu.history" = "기록";
+"history.title" = "기록";
+"history.clear" = "모두 지우기";
+"history.empty" = "아직 전사 기록이 없습니다";
+"history.source.mic" = "마이크";
+"history.source.system" = "시스템 오디오";
+"history.source.file" = "파일";
+"history.copy_tooltip" = "클립보드에 복사";
+
+/* Result window */
+"result.title.mic" = "전사 결과";
+"result.title.system" = "시스템 오디오 전사";
+"result.title.file" = "파일 전사";
+"result.copy" = "복사";
+"result.copied" = "복사됨 ✓";
+"result.chars" = "자";
+
+/* Screen Recording permission */
+"menu.screen_recording_required" = "화면 녹화 권한이 필요합니다";
+"menu.screen_recording_hint" = "시스템 오디오 캡처에 필요";

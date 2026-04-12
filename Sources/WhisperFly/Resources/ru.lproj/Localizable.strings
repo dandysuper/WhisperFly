@@ -81,3 +81,25 @@
 "menu.transcribe_file" = "Транскрибировать файл…";
 "file.pick_title" = "Выберите аудио или видео файл";
 "error.no_speech" = "Речь не обнаружена";
+
+/* History */
+"menu.history" = "История";
+"history.title" = "История";
+"history.clear" = "Очистить всё";
+"history.empty" = "Пока нет транскрипций";
+"history.source.mic" = "Микрофон";
+"history.source.system" = "Системный звук";
+"history.source.file" = "Файл";
+"history.copy_tooltip" = "Копировать в буфер обмена";
+
+/* Result window */
+"result.title.mic" = "Транскрипция";
+"result.title.system" = "Транскрипция системного звука";
+"result.title.file" = "Транскрипция файла";
+"result.copy" = "Копировать";
+"result.copied" = "Скопировано ✓";
+"result.chars" = "символов";
+
+/* Screen Recording permission */
+"menu.screen_recording_required" = "Требуется разрешение на запись экрана";
+"menu.screen_recording_hint" = "Необходимо для захвата системного звука";

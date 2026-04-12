@@ -81,3 +81,25 @@
 "menu.transcribe_file" = "Datei transkribieren…";
 "file.pick_title" = "Audio- oder Videodatei auswählen";
 "error.no_speech" = "Keine Sprache erkannt";
+
+/* History */
+"menu.history" = "Verlauf";
+"history.title" = "Verlauf";
+"history.clear" = "Alle löschen";
+"history.empty" = "Noch keine Transkriptionen";
+"history.source.mic" = "Mikrofon";
+"history.source.system" = "Systemaudio";
+"history.source.file" = "Datei";
+"history.copy_tooltip" = "In Zwischenablage kopieren";
+
+/* Result window */
+"result.title.mic" = "Transkription";
+"result.title.system" = "Systemaudio-Transkription";
+"result.title.file" = "Datei-Transkription";
+"result.copy" = "Kopieren";
+"result.copied" = "Kopiert ✓";
+"result.chars" = "Zeichen";
+
+/* Screen Recording permission */
+"menu.screen_recording_required" = "Bildschirmaufnahme-Berechtigung erforderlich";
+"menu.screen_recording_hint" = "Erforderlich für Systemaudio-Aufnahme";

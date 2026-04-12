@@ -23,12 +23,18 @@ final class AppController: ObservableObject {
     private var pasteService: PasteService
     private var currentRecordingURL: URL?
     private let floatingPanel = FloatingPanel()
+    private let resultPanel = TranscriptionResultPanel()
+    private let historyPanel = HistoryPanel()
+    let history = TranscriptionHistory()
     private var hideTask: Task<Void, Never>?
     private let speechSynthesizer = AVSpeechSynthesizer()
     private var targetApp: NSRunningApplication?
     private var accessibilityPollTask: Task<Void, Never>?
+    /// Tracks the file name when transcribing a file
+    private var currentFileName: String?
     
     @Published var accessibilityGranted: Bool = false
+    @Published var screenRecordingGranted: Bool = false
 
     init() {
         let loaded = SettingsStore().load()
@@ -38,6 +44,7 @@ final class AppController: ObservableObject {
         setupAudioCallbacks()
         setupHotkey()
         checkAccessibilityPermission()
+        checkScreenRecordingPermission()
         observeAppActivation()
     }
 
@@ -51,6 +58,7 @@ final class AppController: ObservableObject {
             Task { @MainActor in
                 guard let self else { return }
                 self.accessibilityGranted = Self.probeAccessibility()
+                self.checkScreenRecordingPermission()
             }
         }
     }
@@ -92,6 +100,39 @@ final class AppController: ObservableObject {
     /// Call this whenever the UI becomes visible (e.g. menu popover opens).
     func refreshAccessibility() {
         accessibilityGranted = Self.probeAccessibility()
+    }
+
+    // MARK: - Screen Recording Permission
+
+    /// Checks whether Screen Recording permission is likely granted.
+    func checkScreenRecordingPermission() {
+        screenRecordingGranted = Self.probeScreenRecording()
+    }
+
+    /// Probes Screen Recording permission by attempting a lightweight SCShareableContent query.
+    /// On macOS 14+, SCShareableContent throws if not authorized.
+    private static func probeScreenRecording() -> Bool {
+        // CGWindowListCopyWindowInfo returns empty or a nil array when Screen Recording is denied.
+        let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] ?? []
+        // If we get window info with owner names from other apps, permission is granted.
+        let hasOtherAppWindows = list.contains { info in
+            guard let pid = info[kCGWindowOwnerPID as String] as? Int32 else { return false }
+            return pid != ProcessInfo.processInfo.processIdentifier
+        }
+        return hasOtherAppWindows
+    }
+
+    /// Opens System Settings to the Screen Recording pane.
+    func requestScreenRecordingPermission() {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
+            NSWorkspace.shared.open(url)
+        }
+    }
+
+    // MARK: - History & Result Panels
+
+    func showHistory() {
+        historyPanel.show(history: history, resultPanel: resultPanel)
     }
     
     // MARK: - Hotkey
@@ -306,6 +347,16 @@ final class AppController: ObservableObject {
                 readAloud(finalText)
             }
 
+            // Save to history
+            let historySource: TranscriptionEntry.Source = settings.audioSource == .systemAudio ? .systemAudio : .microphone
+            let entry = TranscriptionEntry(text: finalText, source: historySource, latency: lastLatency)
+            history.add(entry)
+
+            // Show result window only for system audio (mic just types into field)
+            if settings.audioSource == .systemAudio {
+                resultPanel.show(text: finalText, source: .systemAudio)
+            }
+
             status = .idle
             targetApp = nil
             scheduleHidePanel()
@@ -358,6 +409,7 @@ final class AppController: ObservableObject {
         
         guard panel.runModal() == .OK, let fileURL = panel.url else { return }
         
+        currentFileName = fileURL.lastPathComponent
         status = .transcribing
         errorMessage = nil
         hideTask?.cancel()
@@ -434,11 +486,21 @@ final class AppController: ObservableObject {
             if settings.readAloudEnabled {
                 readAloud(finalText)
             }
-            
+
+            // Save to history
+            let fName = currentFileName
+            let entry = TranscriptionEntry(text: finalText, source: .file, fileName: fName, latency: lastLatency)
+            history.add(entry)
+            currentFileName = nil
+
+            // Show result window
+            resultPanel.show(text: finalText, source: .file, fileName: fName)
+
             status = .idle
             scheduleHidePanel()
             
         } catch {
+            currentFileName = nil
             status = .error(error.localizedDescription)
             floatingPanel.hide()
         }

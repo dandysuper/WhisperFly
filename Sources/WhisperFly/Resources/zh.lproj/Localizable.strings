@@ -81,3 +81,25 @@
 "menu.transcribe_file" = "转录文件…";
 "file.pick_title" = "选择音频或视频文件";
 "error.no_speech" = "未检测到语音";
+
+/* History */
+"menu.history" = "历史记录";
+"history.title" = "历史记录";
+"history.clear" = "全部清除";
+"history.empty" = "暂无转录记录";
+"history.source.mic" = "麦克风";
+"history.source.system" = "系统音频";
+"history.source.file" = "文件";
+"history.copy_tooltip" = "复制到剪贴板";
+
+/* Result window */
+"result.title.mic" = "转录结果";
+"result.title.system" = "系统音频转录";
+"result.title.file" = "文件转录";
+"result.copy" = "复制";
+"result.copied" = "已复制 ✓";
+"result.chars" = "字符";
+
+/* Screen Recording permission */
+"menu.screen_recording_required" = "需要屏幕录制权限";
+"menu.screen_recording_hint" = "用于捕获系统音频";
