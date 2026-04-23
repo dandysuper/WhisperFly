@@ -82,12 +82,34 @@ final class SystemAudioCaptureService: NSObject, AudioCapturing, @unchecked Send
         self.recordingURL = url
         self.sessionStarted = false
 
-        writer.startWriting()
+        guard writer.startWriting() else {
+            let desc = writer.error?.localizedDescription ?? "Unknown writer error"
+            self.assetWriter = nil
+            self.audioInput = nil
+            self.recordingURL = nil
+            throw NSError(
+                domain: "WhisperFly", code: 33,
+                userInfo: [NSLocalizedDescriptionKey: "Failed to start audio writer: \(desc)"]
+            )
+        }
 
         // Create and start ScreenCaptureKit stream
         let scStream = SCStream(filter: filter, configuration: config, delegate: self)
-        try scStream.addStreamOutput(self, type: .audio, sampleHandlerQueue: audioQueue)
-        try await scStream.startCapture()
+        do {
+            try scStream.addStreamOutput(self, type: .audio, sampleHandlerQueue: audioQueue)
+            try await scStream.startCapture()
+        } catch {
+            // Clean up writer state so the next attempt starts fresh.
+            audioInput?.markAsFinished()
+            writer.cancelWriting()
+            self.assetWriter = nil
+            self.audioInput = nil
+            self.recordingURL = nil
+            throw NSError(
+                domain: "WhisperFly", code: 30,
+                userInfo: [NSLocalizedDescriptionKey: "Screen Recording permission required for system audio capture. Grant it in System Settings → Privacy & Security → Screen Recording."]
+            )
+        }
         self.stream = scStream
 
         log.info("System audio capture started → \(url.lastPathComponent)")

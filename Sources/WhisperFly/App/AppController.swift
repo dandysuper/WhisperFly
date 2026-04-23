@@ -239,17 +239,24 @@ final class AppController: ObservableObject {
             }
 
         case .systemAudio:
-            // Always request access — shows the system dialog on the very first call.
             CGRequestScreenCaptureAccess()
             checkScreenRecordingPermission()
-            // Do NOT hard-block on !screenRecordingGranted here.
-            // CGPreflightScreenCaptureAccess() returns false negatives on macOS 26
-            // (Tahoe) even when the user has already granted permission.
-            // The authoritative check is the SCShareableContent call inside
-            // SystemAudioCaptureService.startRecording(); if that throws we surface
-            // a clear error below.
             if !screenRecordingGranted {
-                log.warning("CGPreflightScreenCaptureAccess returned false — proceeding anyway (macOS 26 false-negative workaround)")
+                if #available(macOS 26, *) {
+                    // CGPreflightScreenCaptureAccess() has known false negatives
+                    // on macOS 26 (Tahoe). Defer to the SCShareableContent call
+                    // inside SystemAudioCaptureService as the authoritative check.
+                    log.warning("CGPreflightScreenCaptureAccess returned false — proceeding anyway (macOS 26 false-negative workaround)")
+                } else {
+                    // On macOS 14/15, CGPreflightScreenCaptureAccess() is reliable.
+                    status = .error("Screen Recording permission required for system audio capture.")
+                    showNotification(
+                        title: "Screen Recording Required",
+                        body: "Open System Settings → Privacy & Security → Screen Recording and enable WhisperFly, then try again."
+                    )
+                    requestScreenRecordingPermission()
+                    return
+                }
             }
         }
 
