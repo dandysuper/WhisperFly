@@ -43,6 +43,11 @@ brew tap dandysuper/tap
 brew install --cask whisperfly
 ```
 
+To update later:
+```bash
+brew update && brew upgrade --cask whisperfly
+```
+
 **Option 2 — Download DMG:**  
 Grab `WhisperFly.dmg` from the [latest release](https://github.com/dandysuper/WhisperFly/releases/latest), open it, and drag the app to `/Applications`.
 
@@ -205,6 +210,11 @@ Sources/WhisperFly/
 ```bash
 brew tap dandysuper/tap
 brew install --cask whisperfly
+```
+
+Для обновления:
+```bash
+brew update && brew upgrade --cask whisperfly
 ```
 
 **Вариант 2 — Скачать DMG:**  
