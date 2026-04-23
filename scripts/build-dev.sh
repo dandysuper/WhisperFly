@@ -20,6 +20,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APP_BUNDLE="$REPO_ROOT/WhisperFly.app"
 APP_BINARY="$APP_BUNDLE/Contents/MacOS/WhisperFly"
 ENTITLEMENTS="$REPO_ROOT/WhisperFly.entitlements"
+SIGN_APP_SCRIPT="$REPO_ROOT/scripts/sign-app.sh"
 
 # Build configuration
 BUILD_CONFIG="debug"
@@ -50,36 +51,10 @@ echo "==> Copying binary into $APP_BUNDLE..."
 cp "$BUILT_BINARY" "$APP_BINARY"
 chmod +x "$APP_BINARY"
 
-# Detect signing identity
-# Use the identity already embedded in the .app if available; otherwise fall
-# back to the first "Apple Development" cert found in the keychain.
-CURRENT_IDENTITY=""
-
-CURRENT_IDENTITY="$(codesign -d --verbose=1 "$APP_BUNDLE" 2>&1 \
-    | grep 'Authority=' | head -1 | sed 's/Authority=//')" || true
-
-if [ -z "$CURRENT_IDENTITY" ]; then
-    CURRENT_IDENTITY="$(security find-identity -v -p codesigning \
-        | grep 'Apple Development' | head -1 \
-        | sed 's/.*) //' | sed 's/ ".*"//')" || true
-fi
-
-if [ -z "$CURRENT_IDENTITY" ]; then
-    echo "ERROR: No signing identity found. Install an Apple Development certificate." >&2
-    echo "       Run: security find-identity -v -p codesigning" >&2
-    exit 1
-fi
-
-echo "==> Signing with identity: $CURRENT_IDENTITY"
-echo "    Entitlements: $ENTITLEMENTS"
-
-codesign \
-    --force \
-    --sign "$CURRENT_IDENTITY" \
-    --entitlements "$ENTITLEMENTS" \
-    --options runtime \
-    --deep \
-    "$APP_BUNDLE"
+echo "==> Re-signing app bundle with stable designated requirement..."
+"$SIGN_APP_SCRIPT" \
+    --app "$APP_BUNDLE" \
+    --entitlements "$ENTITLEMENTS"
 
 echo ""
 echo "Build complete!"

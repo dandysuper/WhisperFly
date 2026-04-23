@@ -118,9 +118,9 @@ xattr -cr /Applications/WhisperFly.app
 
 ### Reinstalling / Updating
 
-When you reinstall or update WhisperFly, macOS ties Accessibility permissions to the binary hash. After an update the old entry becomes stale and text injection silently stops working.
+Current WhisperFly builds are signed with a stable designated requirement, so **Microphone**, **Screen Recording**, and **Accessibility** permissions should persist across normal in-place updates and reinstalls as long as the app keeps the same bundle identifier and Apple developer team.
 
-**You must remove and re-add WhisperFly in Accessibility settings:**
+If you are updating from an older build that was signed differently, macOS may still treat it as a different app once. In that case, do a one-time reset:
 
 1. Quit WhisperFly.
 2. Install the new version (`brew upgrade whisperfly` or drag the new `.app` to `/Applications`).
@@ -282,9 +282,9 @@ xattr -cr /Applications/WhisperFly.app
 
 ### Переустановка / Обновление
 
-При обновлении WhisperFly macOS привязывает разрешения Accessibility к хешу бинарника. После обновления старая запись становится недействительной и вставка текста молча перестаёт работать.
+Текущие сборки WhisperFly подписываются со стабильным designated requirement, поэтому разрешения **Микрофон**, **Захват экрана** и **Специальные возможности** должны сохраняться при обычном обновлении и переустановке, пока у приложения остаются тот же bundle identifier и та же команда Apple Developer.
 
-**Необходимо удалить и заново добавить WhisperFly в настройках Accessibility:**
+Если вы обновляетесь со старой сборки, подписанной иначе, macOS может один раз посчитать её другим приложением. В таком случае сделайте одноразовый сброс:
 
 1. Закройте WhisperFly.
 2. Установите новую версию (`brew upgrade whisperfly` или перетащите новый `.app` в `/Applications`).

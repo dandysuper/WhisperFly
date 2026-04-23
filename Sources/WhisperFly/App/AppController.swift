@@ -334,7 +334,7 @@ final class AppController: ObservableObject {
                     }
                 }
                 currentRecordingURL = url
-                await processAudio(url: url)
+                await processAudio(url: url, source: source ?? .microphone)
             } catch {
                 log.error("finishRecording failed: \(error.localizedDescription)")
                 status = .error(error.localizedDescription)
@@ -358,7 +358,7 @@ final class AppController: ObservableObject {
 
     // MARK: - Transcription + Rewrite Pipeline
 
-    private func processAudio(url: URL) async {
+    private func processAudio(url: URL, source: AppSettings.AudioSource) async {
         status = .transcribing
         audioLevel = -160
         defer {
@@ -402,7 +402,7 @@ final class AppController: ObservableObject {
             status = .pasting
             log.info("finalText to paste: '\(finalText)'")
 
-            if settings.audioSource == .systemAudio {
+            if source == .systemAudio {
                 // System audio mode: copy to clipboard only (no paste into app)
                 let pasteboard = NSPasteboard.general
                 pasteboard.clearContents()
@@ -445,12 +445,12 @@ final class AppController: ObservableObject {
             }
 
             // Save to history
-            let historySource: TranscriptionEntry.Source = settings.audioSource == .systemAudio ? .systemAudio : .microphone
+            let historySource: TranscriptionEntry.Source = source == .systemAudio ? .systemAudio : .microphone
             let entry = TranscriptionEntry(text: finalText, source: historySource, latency: lastLatency)
             history.add(entry)
 
             // Show result window only for system audio (mic just types into field)
-            if settings.audioSource == .systemAudio {
+            if source == .systemAudio {
                 resultPanel.show(text: finalText, source: .systemAudio)
             }
 

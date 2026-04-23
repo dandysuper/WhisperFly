@@ -20,24 +20,37 @@ TAP_ROOT="$(cd "$REPO_ROOT/../homebrew-tap" 2>/dev/null && pwd)" || true
 DMG_NAME="WhisperFly.dmg"
 APP_NAME="WhisperFly.app"
 BUILD_DIR="$REPO_ROOT/.build/release-stage"
+ENTITLEMENTS="$REPO_ROOT/WhisperFly.entitlements"
+SIGN_APP_SCRIPT="$REPO_ROOT/scripts/sign-app.sh"
+DEVELOPER_IDENTITY="$(security find-identity -v -p codesigning | grep 'Developer ID Application' | head -1 | sed 's/.* "//; s/"$//' || true)"
+APP_PATH="$REPO_ROOT/$APP_NAME"
 
 echo "==> Building WhisperFly ${TAG}..."
-xcodebuild \
-  -scheme WhisperFly \
-  -configuration Release \
-  -derivedDataPath "$REPO_ROOT/.build/xcode" \
-  -destination 'platform=macOS' \
-  build
+./scripts/build-dev.sh --release
 
-APP_PATH=$(find "$REPO_ROOT/.build/xcode" -name "$APP_NAME" -maxdepth 6 | head -1)
-if [[ -z "$APP_PATH" ]]; then
-  echo "ERROR: $APP_NAME not found after build." >&2
+if [[ ! -d "$APP_PATH" ]]; then
+  echo "ERROR: $APP_PATH not found after release build." >&2
   exit 1
 fi
 
 echo "==> Creating DMG..."
 rm -rf "$BUILD_DIR" && mkdir -p "$BUILD_DIR"
 cp -R "$APP_PATH" "$BUILD_DIR/"
+
+echo "==> Signing release app with stable designated requirement..."
+if [[ -n "$DEVELOPER_IDENTITY" ]]; then
+  "$SIGN_APP_SCRIPT" \
+    --app "$BUILD_DIR/$APP_NAME" \
+    --entitlements "$ENTITLEMENTS" \
+    --identity "$DEVELOPER_IDENTITY" \
+    --require-distribution
+else
+  echo "WARN: No Developer ID Application certificate found. Falling back to Apple Development signing for this release."
+  "$SIGN_APP_SCRIPT" \
+    --app "$BUILD_DIR/$APP_NAME" \
+    --entitlements "$ENTITLEMENTS"
+fi
+
 create-dmg \
   --volname "WhisperFly ${VERSION}" \
   --window-pos 200 120 \
@@ -48,6 +61,11 @@ create-dmg \
   --app-drop-link 480 170 \
   "$REPO_ROOT/$DMG_NAME" \
   "$BUILD_DIR/"
+
+if [[ -n "$DEVELOPER_IDENTITY" ]]; then
+  echo "==> Signing DMG..."
+  codesign --force --sign "$DEVELOPER_IDENTITY" "$REPO_ROOT/$DMG_NAME"
+fi
 
 SHA256=$(shasum -a 256 "$REPO_ROOT/$DMG_NAME" | awk '{print $1}')
 echo "==> DMG SHA256: $SHA256"
