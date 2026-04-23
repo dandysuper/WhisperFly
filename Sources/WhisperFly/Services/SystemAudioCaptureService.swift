@@ -11,13 +11,17 @@ final class SystemAudioCaptureService: NSObject, AudioCapturing, @unchecked Send
     var onMaxDurationReached: (@Sendable () -> Void)?
 
     private var stream: SCStream?
-    private var assetWriter: AVAssetWriter?
-    private var audioInput: AVAssetWriterInput?
     private var recordingURL: URL?
     private var durationTask: Task<Void, Never>?
     private var maxDuration: TimeInterval = 300
-    private var sessionStarted = false
     private let audioQueue = DispatchQueue(label: "com.whisperfly.systemaudio")
+
+    // State shared between audioQueue (callback) and caller context.
+    // Access ONLY while holding `stateLock`.
+    private let stateLock = NSLock()
+    private var assetWriter: AVAssetWriter?
+    private var audioInput: AVAssetWriterInput?
+    private var sessionStarted = false
 
     private let recordingsDir: URL = {
         let dir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
@@ -31,6 +35,9 @@ final class SystemAudioCaptureService: NSObject, AudioCapturing, @unchecked Send
     }
 
     func startRecording() async throws -> URL {
+        // Clean up any leftover state from a previous failed attempt.
+        await resetState()
+
         let url = recordingsDir.appendingPathComponent("\(UUID().uuidString).m4a")
 
         // Get available content — throws if Screen Recording permission is not granted
@@ -77,21 +84,21 @@ final class SystemAudioCaptureService: NSObject, AudioCapturing, @unchecked Send
         input.expectsMediaDataInRealTime = true
         writer.add(input)
 
-        self.assetWriter = writer
-        self.audioInput = input
-        self.recordingURL = url
-        self.sessionStarted = false
-
         guard writer.startWriting() else {
             let desc = writer.error?.localizedDescription ?? "Unknown writer error"
-            self.assetWriter = nil
-            self.audioInput = nil
-            self.recordingURL = nil
             throw NSError(
                 domain: "WhisperFly", code: 33,
                 userInfo: [NSLocalizedDescriptionKey: "Failed to start audio writer: \(desc)"]
             )
         }
+
+        stateLock.lock()
+        self.assetWriter = writer
+        self.audioInput = input
+        self.sessionStarted = false
+        stateLock.unlock()
+
+        self.recordingURL = url
 
         // Create and start ScreenCaptureKit stream
         let scStream = SCStream(filter: filter, configuration: config, delegate: self)
@@ -100,11 +107,18 @@ final class SystemAudioCaptureService: NSObject, AudioCapturing, @unchecked Send
             try await scStream.startCapture()
         } catch {
             // Clean up writer state so the next attempt starts fresh.
-            audioInput?.markAsFinished()
-            writer.cancelWriting()
-            self.assetWriter = nil
+            stateLock.lock()
+            let lockedInput = audioInput
+            let lockedWriter = assetWriter
             self.audioInput = nil
+            self.assetWriter = nil
+            self.sessionStarted = false
+            stateLock.unlock()
+
+            lockedInput?.markAsFinished()
+            lockedWriter?.cancelWriting()
             self.recordingURL = nil
+
             throw NSError(
                 domain: "WhisperFly", code: 30,
                 userInfo: [NSLocalizedDescriptionKey: "Screen Recording permission required for system audio capture. Grant it in System Settings → Privacy & Security → Screen Recording."]
@@ -133,13 +147,24 @@ final class SystemAudioCaptureService: NSObject, AudioCapturing, @unchecked Send
         }
         stream = nil
 
-        // Finalize the asset writer
-        audioInput?.markAsFinished()
-        if let writer = assetWriter, writer.status == .writing {
+        // Drain audioQueue so all pending callbacks complete before cleanup.
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            audioQueue.async { continuation.resume() }
+        }
+
+        // Now safe to tear down the writer — no more callbacks can fire.
+        stateLock.lock()
+        let input = audioInput
+        let writer = assetWriter
+        self.audioInput = nil
+        self.assetWriter = nil
+        self.sessionStarted = false
+        stateLock.unlock()
+
+        input?.markAsFinished()
+        if let writer, writer.status == .writing {
             await writer.finishWriting()
         }
-        assetWriter = nil
-        audioInput = nil
 
         guard let url = recordingURL else {
             throw NSError(
@@ -162,17 +187,60 @@ final class SystemAudioCaptureService: NSObject, AudioCapturing, @unchecked Send
         }
         stream = nil
 
-        audioInput?.markAsFinished()
-        if let writer = assetWriter, writer.status == .writing {
+        // Drain audioQueue so all pending callbacks complete before cleanup.
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            audioQueue.async { continuation.resume() }
+        }
+
+        stateLock.lock()
+        let input = audioInput
+        let writer = assetWriter
+        self.audioInput = nil
+        self.assetWriter = nil
+        self.sessionStarted = false
+        stateLock.unlock()
+
+        input?.markAsFinished()
+        if let writer, writer.status == .writing {
             await writer.finishWriting()
         }
-        assetWriter = nil
-        audioInput = nil
 
         if let url = recordingURL {
             try? FileManager.default.removeItem(at: url)
         }
         recordingURL = nil
+    }
+
+    /// Tears down any leftover stream/writer state from a previous attempt.
+    private func resetState() async {
+        if let stream {
+            try? await stream.stopCapture()
+            self.stream = nil
+            await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+                audioQueue.async { continuation.resume() }
+            }
+        }
+
+        stateLock.lock()
+        let input = audioInput
+        let writer = assetWriter
+        self.audioInput = nil
+        self.assetWriter = nil
+        self.sessionStarted = false
+        stateLock.unlock()
+
+        input?.markAsFinished()
+        if let writer, writer.status == .writing {
+            writer.cancelWriting()
+        }
+
+        if let url = recordingURL {
+            try? FileManager.default.removeItem(at: url)
+        }
+        recordingURL = nil
+
+        durationTask?.cancel()
+        durationTask = nil
     }
 
     // MARK: - Audio Level Metering
@@ -218,20 +286,31 @@ extension SystemAudioCaptureService: SCStreamOutput {
     nonisolated func stream(_ stream: SCStream, didOutputSampleBuffer sampleBuffer: CMSampleBuffer, of type: SCStreamOutputType) {
         guard type == .audio else { return }
 
-        // Audio level metering
+        // Audio level metering (read-only on the buffer, no shared state)
         let level = calculateAudioLevel(from: sampleBuffer)
         onAudioLevel?(level)
 
+        // Safely snapshot shared state under the lock.
+        stateLock.lock()
+        let writer = assetWriter
+        let input = audioInput
+        let started = sessionStarted
+        stateLock.unlock()
+
+        guard let writer, let input else { return }
+
         // Start asset writer session with first sample's timestamp
-        if !sessionStarted {
+        if !started {
             let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
-            assetWriter?.startSession(atSourceTime: timestamp)
+            writer.startSession(atSourceTime: timestamp)
+            stateLock.lock()
             sessionStarted = true
+            stateLock.unlock()
         }
 
         // Write audio to file
-        if audioInput?.isReadyForMoreMediaData == true {
-            audioInput?.append(sampleBuffer)
+        if input.isReadyForMoreMediaData {
+            input.append(sampleBuffer)
         }
     }
 }
