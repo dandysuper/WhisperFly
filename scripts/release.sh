@@ -3,7 +3,6 @@
 # Example: ./scripts/release.sh 1.1.0
 #
 # Prerequisites:
-#   brew install create-dmg
 #   gh auth login
 
 set -euo pipefail
@@ -51,16 +50,12 @@ else
     --entitlements "$ENTITLEMENTS"
 fi
 
-create-dmg \
-  --volname "WhisperFly ${VERSION}" \
-  --window-pos 200 120 \
-  --window-size 660 400 \
-  --icon-size 128 \
-  --icon "$APP_NAME" 180 170 \
-  --hide-extension "$APP_NAME" \
-  --app-drop-link 480 170 \
-  "$REPO_ROOT/$DMG_NAME" \
-  "$BUILD_DIR/"
+rm -f "$REPO_ROOT/$DMG_NAME"
+hdiutil create \
+  -volname "WhisperFly ${VERSION}" \
+  -srcfolder "$BUILD_DIR" \
+  -format UDZO \
+  "$REPO_ROOT/$DMG_NAME"
 
 if [[ -n "$DEVELOPER_IDENTITY" ]]; then
   echo "==> Signing DMG..."
