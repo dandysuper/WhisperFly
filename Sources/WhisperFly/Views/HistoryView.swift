@@ -74,7 +74,7 @@ struct HistoryView: View {
 
 struct HistoryRow: View {
     let entry: TranscriptionEntry
-    @State private var copied = false
+    @StateObject private var copied = LocalFlag(false)
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
@@ -105,9 +105,9 @@ struct HistoryRow: View {
             Spacer()
 
             Button(action: { copyText() }) {
-                Image(systemName: copied ? "checkmark" : "doc.on.doc")
+                Image(systemName: copied.value ? "checkmark" : "doc.on.doc")
                     .font(.system(size: 11))
-                    .foregroundColor(copied ? .green : .secondary)
+                    .foregroundColor(copied.value ? .green : .secondary)
             }
             .buttonStyle(.plain)
             .help(L("history.copy_tooltip", "Copy to clipboard"))
@@ -116,12 +116,10 @@ struct HistoryRow: View {
     }
 
     private func copyText() {
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(entry.text, forType: .string)
-        withAnimation { copied = true }
+        ClipboardWriter.write(entry.text)
+        withAnimation { copied.value = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation { copied = false }
+            withAnimation { copied.value = false }
         }
     }
 }

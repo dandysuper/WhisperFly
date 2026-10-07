@@ -6,7 +6,7 @@ struct TranscriptionResultView: View {
     let fileName: String?
     let onClose: () -> Void
 
-    @State private var copied = false
+    @StateObject private var copied = LocalFlag(false)
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -41,13 +41,13 @@ struct TranscriptionResultView: View {
             // Actions
             HStack {
                 Button(action: copyToClipboard) {
-                    Label(copied
+                    Label(copied.value
                           ? L("result.copied", "Copied ✓")
                           : L("result.copy", "Copy"),
-                          systemImage: copied ? "checkmark" : "doc.on.doc")
+                          systemImage: copied.value ? "checkmark" : "doc.on.doc")
                 }
                 .buttonStyle(.borderedProminent)
-                .tint(copied ? .green : .accentColor)
+                .tint(copied.value ? .green : .accentColor)
 
                 Spacer()
 
@@ -84,12 +84,10 @@ struct TranscriptionResultView: View {
     }
 
     private func copyToClipboard() {
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(text, forType: .string)
-        withAnimation { copied = true }
+        ClipboardWriter.write(text)
+        withAnimation { copied.value = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            withAnimation { copied = false }
+            withAnimation { copied.value = false }
         }
     }
 }

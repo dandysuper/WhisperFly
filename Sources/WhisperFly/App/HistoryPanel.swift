@@ -36,7 +36,9 @@ final class HistoryPanel {
         p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         p.contentView = hosting
         p.isReleasedWhenClosed = false
-        p.center()
+        // `NSWindow.center()` targets the primary screen; history belongs on the
+        // display the user is working on.
+        ScreenPlacement.center(p)
 
         self.panel = p
         p.orderFrontRegardless()

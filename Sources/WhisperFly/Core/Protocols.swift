@@ -52,7 +52,8 @@ protocol AudioCapturing: Sendable {
 }
 
 protocol HotkeyMonitoring: Sendable {
-    func register() throws
+    /// Registers `preset` as the global shortcut, replacing any previous one.
+    func register(preset: AppSettings.HotkeyPreset) throws
     func unregister()
     var onPress: (@Sendable () -> Void)? { get set }
     var onRelease: (@Sendable () -> Void)? { get set }

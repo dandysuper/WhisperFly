@@ -25,7 +25,11 @@ DEVELOPER_IDENTITY="$(security find-identity -v -p codesigning | grep 'Developer
 APP_PATH="$REPO_ROOT/$APP_NAME"
 
 echo "==> Building WhisperFly ${TAG}..."
-./scripts/build-dev.sh --release
+# build-app.sh assembles the bundle from scratch and stamps the commit metadata
+# the in-app updater compares against the branch head. The release DMG is
+# universal so one artifact serves Apple silicon and Intel; the updater's
+# preferredDMG() treats the non-arch-suffixed name as the universal slot.
+WHISPERFLY_VERSION="$VERSION" ./scripts/build-app.sh --universal
 
 if [[ ! -d "$APP_PATH" ]]; then
   echo "ERROR: $APP_PATH not found after release build." >&2

@@ -30,7 +30,10 @@ final class AppController: ObservableObject {
     private var hideTask: Task<Void, Never>?
     private let speechSynthesizer = AVSpeechSynthesizer()
     private var targetApp: NSRunningApplication?
-    private var accessibilityPollTask: Task<Void, Never>?
+    /// The preset currently held by `hotkeyMonitor`, so `saveSettings()` — which
+    /// fires on every keystroke in the settings form — does not re-register the
+    /// shortcut needlessly.
+    private var registeredHotkey: AppSettings.HotkeyPreset?
     /// Tracks the file name when transcribing a file
     private var currentFileName: String?
     /// Set to `true` when the system-audio recording receives at least one
@@ -43,95 +46,55 @@ final class AppController: ObservableObject {
     /// picker while a recording is in progress.
     private var activeAudioSource: AppSettings.AudioSource?
 
-    @Published var accessibilityGranted: Bool = false
-    @Published var screenRecordingGranted: Bool = false
+    /// The single authority on Microphone, Screen Recording and Accessibility.
+    /// The controller previously kept its own pair of `Bool`s and a bespoke
+    /// `CGPreflightScreenCaptureAccess()` call gated behind `#available(macOS 26)`;
+    /// that version check is why the app believed permissions were granted on the
+    /// releases it had not been updated for.
+    let permissions = PermissionService()
+
+    /// Commit-based updater for the GitHub repository this build came from.
+    let updates: UpdateService
 
     init() {
         let loaded = SettingsStore().load()
         self.settings = loaded
         self.pasteService = PasteService(pasteDelayMs: loaded.pasteDelayMs)
+        self.updates = UpdateService(configuration: Self.updateConfiguration(from: loaded))
 
         setupAudioCallbacks()
         setupHotkey()
-        checkAccessibilityPermission()
-        checkScreenRecordingPermission()
         observeAppActivation()
         requestNotificationAuthorization()
+
+        Task { await permissions.refreshAll() }
+        Task { await updates.checkIfDue() }
     }
 
-    /// Re-checks accessibility whenever the app becomes active (e.g. user returns from System Settings).
+    /// Projects the persisted settings onto the updater's configuration.
+    static func updateConfiguration(from settings: AppSettings) -> UpdateService.Configuration {
+        UpdateService.Configuration(
+            repository: settings.updateRepository,
+            branch: settings.updateBranch,
+            token: settings.updateToken,
+            sourceCheckoutPath: settings.updateSourceCheckoutPath,
+            automaticallyChecks: settings.updateAutomaticallyChecks,
+            checkIntervalHours: settings.updateCheckIntervalHours
+        )
+    }
+
+    /// Re-checks permissions whenever the app becomes active — the moment a user
+    /// normally returns from System Settings, so the menu bar reflects the change
+    /// without needing a relaunch.
     private func observeAppActivation() {
-        requestNotificationAuthorization()
         NotificationCenter.default.addObserver(
             forName: NSApplication.didBecomeActiveNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
             Task { @MainActor in
-                guard let self else { return }
-                self.accessibilityGranted = Self.probeAccessibility()
-                self.checkScreenRecordingPermission()
+                await self?.permissions.refreshOnActivation()
             }
-        }
-    }
-
-    /// Actually attempts an AX call to verify accessibility works (not just cached).
-    /// `AXIsProcessTrusted()` can return a stale `true` after the binary changes,
-    /// so we do a real probe: query the system-wide focused element.
-    private static func probeAccessibility() -> Bool {
-        PasteService.isAccessibilityWorking()
-    }
-
-    /// Checks Accessibility permission; starts a background poll until granted.
-    func checkAccessibilityPermission() {
-        // Show the system prompt if not trusted at all.
-        let options = ["AXTrustedCheckOptionPrompt": true] as CFDictionary
-        _ = AXIsProcessTrustedWithOptions(options)
-
-        // Use the live probe, not the cached API.
-        accessibilityGranted = Self.probeAccessibility()
-        guard !accessibilityGranted else { return }
-
-        // Cancel any existing poll and start a new one (no timeout — polls until granted).
-        accessibilityPollTask?.cancel()
-        accessibilityPollTask = Task {
-            while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(1))
-                if Self.probeAccessibility() {
-                    await MainActor.run {
-                        self.accessibilityGranted = true
-                        self.accessibilityPollTask = nil
-                    }
-                    return
-                }
-            }
-        }
-    }
-
-    /// Lightweight re-check without showing the system prompt.
-    /// Call this whenever the UI becomes visible (e.g. menu popover opens).
-    func refreshAccessibility() {
-        accessibilityGranted = Self.probeAccessibility()
-    }
-
-    // MARK: - Screen Recording Permission
-
-    /// Checks whether Screen Recording permission is likely granted.
-    func checkScreenRecordingPermission() {
-        screenRecordingGranted = Self.probeScreenRecording()
-    }
-
-    /// Probes Screen Recording permission by attempting a lightweight SCShareableContent query.
-    /// On macOS 14+, SCShareableContent throws if not authorized.
-    private static func probeScreenRecording() -> Bool {
-        CGPreflightScreenCaptureAccess()
-    }
-
-    /// Opens System Settings to the Screen Recording pane.
-    func requestScreenRecordingPermission() {
-        CGRequestScreenCaptureAccess()
-        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture") {
-            NSWorkspace.shared.open(url)
         }
     }
 
@@ -167,10 +130,22 @@ final class AppController: ObservableObject {
                 self?.hotkeyReleased()
             }
         }
+        reregisterHotkeyIfNeeded()
+    }
+
+    /// Re-registers the global shortcut when the preference actually changed.
+    ///
+    /// `saveSettings()` runs on every keystroke in the settings form, so this is
+    /// deliberately idempotent rather than registering on each call.
+    private func reregisterHotkeyIfNeeded() {
+        guard registeredHotkey != settings.hotkey else { return }
         do {
-            try hotkeyMonitor.register()
+            try hotkeyMonitor.register(preset: settings.hotkey)
+            registeredHotkey = settings.hotkey
+            errorMessage = nil
         } catch {
-            self.errorMessage = "Hotkey registration failed: \(error.localizedDescription)"
+            errorMessage = error.localizedDescription
+            log.error("Hotkey registration failed: \(error.localizedDescription, privacy: .public)")
         }
     }
 
@@ -224,41 +199,9 @@ final class AppController: ObservableObject {
 
     func startRecording() {
         guard status == .idle else { return }
-        refreshAccessibility()
 
-        switch settings.audioSource {
-        case .microphone:
-            let authStatus = AVCaptureDevice.authorizationStatus(for: .audio)
-            switch authStatus {
-            case .denied, .restricted:
-                status = .error("Microphone access denied. Open System Settings -> Privacy -> Microphone.")
-                showNotification(title: "Microphone Required", body: "Open System Settings -> Privacy -> Microphone and enable WhisperFly.")
-                return
-            default:
-                break
-            }
-
-        case .systemAudio:
-            CGRequestScreenCaptureAccess()
-            checkScreenRecordingPermission()
-            if !screenRecordingGranted {
-                if #available(macOS 26, *) {
-                    // CGPreflightScreenCaptureAccess() has known false negatives
-                    // on macOS 26 (Tahoe). Defer to the SCShareableContent call
-                    // inside SystemAudioCaptureService as the authoritative check.
-                    log.warning("CGPreflightScreenCaptureAccess returned false — proceeding anyway (macOS 26 false-negative workaround)")
-                } else {
-                    // On macOS 14/15, CGPreflightScreenCaptureAccess() is reliable.
-                    status = .error("Screen Recording permission required for system audio capture.")
-                    showNotification(
-                        title: "Screen Recording Required",
-                        body: "Open System Settings → Privacy & Security → Screen Recording and enable WhisperFly, then try again."
-                    )
-                    requestScreenRecordingPermission()
-                    return
-                }
-            }
-        }
+        let required: PermissionKind = settings.audioSource == .microphone ? .microphone : .screenRecording
+        guard verifyPermission(required) else { return }
 
         if settings.audioSource == .microphone {
             targetApp = NSWorkspace.shared.frontmostApplication
@@ -303,6 +246,41 @@ final class AppController: ObservableObject {
                 floatingPanel.hide()
             }
         }
+    }
+
+    /// Decides whether a recording may start for `kind`, prompting or refusing as
+    /// appropriate.
+    ///
+    /// Microphone state comes from `AVCaptureDevice.authorizationStatus`, which is
+    /// synchronous and always current, so a denial is always acted upon. Screen
+    /// Recording state can legitimately be `.unknown`: `CGPreflightScreenCaptureAccess()`
+    /// has documented false negatives, so in that case the capture attempt itself is
+    /// allowed to decide. The previous code reached the same conclusion, but only on
+    /// the macOS version it had been updated for and by guessing afterwards.
+    private func verifyPermission(_ kind: PermissionKind) -> Bool {
+        switch permissions.state(for: kind) {
+        case .granted, .unknown:
+            return true
+
+        case .notDetermined:
+            // Ask, and let the capture attempt run: the system prompt is shown
+            // immediately and the engine starts as soon as it is answered.
+            Task { await permissions.request(kind) }
+            return true
+
+        case .denied, .restricted:
+            refuseRecording(kind)
+            return false
+        }
+    }
+
+    private func refuseRecording(_ kind: PermissionKind) {
+        let message = L("error.permission_required",
+                        "%@ permission is required for this audio source. Enable it in System Settings, then try again.",
+                        kind.title)
+        status = .error(message)
+        showNotification(title: kind.title, body: message)
+        permissions.openSettings(for: kind)
     }
 
     func finishRecording() {
@@ -404,10 +382,8 @@ final class AppController: ObservableObject {
 
             if source == .systemAudio {
                 // System audio mode: copy to clipboard only (no paste into app)
-                let pasteboard = NSPasteboard.general
-                pasteboard.clearContents()
-                pasteboard.setString(finalText, forType: .string)
-                log.info("✅ System audio transcription copied to clipboard")
+                ClipboardWriter.write(finalText)
+                log.info("System audio transcription copied to clipboard")
             } else {
                 // Microphone mode: paste into the target app
                 // Always re-activate the target app before pasting. Even though
@@ -575,10 +551,8 @@ final class AppController: ObservableObject {
 
             // Always copy to clipboard for file transcription
             status = .pasting
-            let pasteboard = NSPasteboard.general
-            pasteboard.clearContents()
-            pasteboard.setString(finalText, forType: .string)
-            log.info("✅ File transcription copied to clipboard (\(finalText.count) chars)")
+            ClipboardWriter.write(finalText)
+            log.info("File transcription copied to clipboard (\(finalText.count) chars)")
 
             if settings.readAloudEnabled {
                 readAloud(finalText)
@@ -610,6 +584,59 @@ final class AppController: ObservableObject {
         pasteService = PasteService(pasteDelayMs: settings.pasteDelayMs)
         audioService.configure(maxRecordingSeconds: settings.maxRecordingSeconds)
         systemAudioService.configure(maxRecordingSeconds: settings.maxRecordingSeconds)
+        syncUpdateConfiguration()
+        reregisterHotkeyIfNeeded()
+    }
+
+    /// Keeps the updater pointed at the repository the settings UI names.
+    private func syncUpdateConfiguration() {
+        let configuration = Self.updateConfiguration(from: settings)
+        if updates.configuration != configuration {
+            updates.configuration = configuration
+        }
+    }
+
+    // MARK: - Permissions and updates (UI entry points)
+
+    /// Clears this app's TCC rows and relaunches.
+    ///
+    /// This is the only reliable remedy when the build was re-signed: macOS keeps
+    /// the old grant rows matched to a designated requirement that no longer
+    /// applies, so System Settings shows WhisperFly as enabled while the running
+    /// process is still untrusted. Toggling cannot fix that — the row has to go.
+    @discardableResult
+    func repairPermissionsAndRelaunch() -> String? {
+        let failures = PermissionRepair.resetAll(bundleIdentifier: BuildInfo.bundleIdentifier)
+        guard failures.isEmpty else {
+            // Deliberately do not relaunch: restarting on a half-cleared state
+            // would drop the user back into the same broken app with no reason.
+            let names = failures.map(\.title).joined(separator: ", ")
+            return L("permission.repair.partial",
+                     "Could not reset: %@. Try again, or remove WhisperFly from the Privacy lists manually.", names)
+        }
+        PermissionRepair.relaunch()
+        return nil
+    }
+
+    func requestPermission(_ kind: PermissionKind) {
+        Task {
+            await permissions.request(kind)
+            if kind.requiresRelaunchToTakeEffect && permissions.isGranted(kind) {
+                showNotification(
+                    title: kind.title,
+                    body: L("permission.relaunch_hint",
+                            "Granted. WhisperFly needs to restart before this takes effect.")
+                )
+            }
+        }
+    }
+
+    func checkForUpdatesNow() {
+        Task { await updates.check() }
+    }
+
+    func installUpdate(using method: UpdateInstallMethod) {
+        Task { await updates.install(using: method) }
     }
 
     func dismissError() {

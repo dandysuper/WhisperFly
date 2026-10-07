@@ -29,7 +29,9 @@ final class TranscriptionResultPanel {
         p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         p.contentView = hosting
         p.isReleasedWhenClosed = false
-        p.center()
+        // `NSWindow.center()` targets the primary screen; the result belongs on
+        // the display the user dictated on.
+        ScreenPlacement.center(p)
 
         self.panel = p
         p.orderFrontRegardless()

@@ -17,3 +17,8 @@ TextInjector_protocol_and_types.swift
 
 # Partial / temp DMGs left by create-dmg
 rw.*.dmg
+
+# Build products — reproducible via scripts/build-app.sh and scripts/release.sh
+WhisperFly.app/
+WhisperFlow.app/
+*.dmg
