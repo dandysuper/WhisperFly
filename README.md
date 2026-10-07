@@ -42,7 +42,7 @@ Fork of [qwenwishper](https://github.com/hukopo/qwenwishper) — replaces all lo
 - **Transcription history** — browse, copy, and re-open any past result
 - **In-app updater** — check against GitHub commits and install release DMGs or rebuild from source without leaving the app
 - **Permission center** — live status, signature diagnosis and one-click TCC repair
-- **Localized UI** — English, Russian, German, French, Spanish, Japanese, Chinese, Korean, Italian, Hindi
+- **Localized UI** — English, Russian, German, French, Spanish, Japanese, Chinese, Korean, Italian, Hindi, Kazakh
 - No local model downloads, no GPU required
 
 ### Install
@@ -202,7 +202,7 @@ Sources/WhisperFly/
 │   ├── SettingsStore.swift             # Decode-resilient persistence + .env fallback
 │   └── TranscriptionHistory.swift      # Lossy-decoded history store
 ├── Resources/
-│   └── *.lproj/Localizable.strings     # en, ru, de, fr, es, ja, zh, ko, it, hi
+│   └── *.lproj/Localizable.strings     # en, ru, de, fr, es, ja, zh, ko, it, hi, kk
 ├── Services/
 │   ├── AudioCaptureService.swift       # Microphone recording
 │   ├── SystemAudioCaptureService.swift # System audio via ScreenCaptureKit
@@ -276,7 +276,7 @@ sign), `build-dev.sh` (debug rebuild of the local bundle), `sign-app.sh`
 - **История транскрипций** — просматривайте, копируйте и заново открывайте любой прошлый результат
 - **Обновление из приложения** — проверка по коммитам GitHub и установка релизного DMG или пересборка из исходников, не выходя из приложения
 - **Центр разрешений** — живой статус, диагностика подписи и сброс TCC в один клик
-- **Локализованный интерфейс** — английский, русский, немецкий, французский, испанский, японский, китайский, корейский, итальянский, хинди
+- **Локализованный интерфейс** — английский, русский, немецкий, французский, испанский, японский, китайский, корейский, итальянский, хинди, казахский
 - Не требует загрузки локальных моделей и GPU
 
 ### Установка
@@ -440,7 +440,7 @@ Sources/WhisperFly/
 │   ├── SettingsStore.swift             # Устойчивое к сбоям декодирования хранилище + .env
 │   └── TranscriptionHistory.swift      # История с побайтово устойчивым декодированием
 ├── Resources/
-│   └── *.lproj/Localizable.strings     # en, ru, de, fr, es, ja, zh, ko, it, hi
+│   └── *.lproj/Localizable.strings     # en, ru, de, fr, es, ja, zh, ko, it, hi, kk
 ├── Services/
 │   ├── AudioCaptureService.swift       # Запись с микрофона
 │   ├── SystemAudioCaptureService.swift # Системный звук через ScreenCaptureKit

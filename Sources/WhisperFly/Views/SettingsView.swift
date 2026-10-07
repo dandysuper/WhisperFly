@@ -50,6 +50,7 @@ struct SettingsView: View {
                 Text(L("lang.ko", "Korean")).tag("ko")
                 Text(L("lang.it", "Italian")).tag("it")
                 Text(L("lang.hi", "Hindi")).tag("hi")
+                Text(L("lang.kk", "Kazakh")).tag("kk")
             }
 
             Toggle(L("settings.enable_rewriting", "Enable Gemini Rewriting"),

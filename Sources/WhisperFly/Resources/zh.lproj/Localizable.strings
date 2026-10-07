@@ -51,6 +51,7 @@
 "lang.ko" = "韩语";
 "lang.it" = "意大利语";
 "lang.hi" = "印地语";
+"lang.kk" = "哈萨克语";
 
 /* Settings – API keys */
 "settings.groq_section" = "Groq (Whisper ASR)";
