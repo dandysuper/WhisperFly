@@ -7,76 +7,43 @@
 "status.error" = "Ошибка: %@";
 
 /* Floating status view */
-"floating.listening" = "Слушаю…";
 "floating.transcribing" = "Транскрибирую…";
-"floating.rewriting" = "Переформулирую…";
-"floating.done" = "Готово ✓";
+"floating.done" = "Готово";
 
 /* Menu bar */
-"menu.start_recording" = "Начать запись";
-"menu.stop_recording" = "Остановить запись";
+"menu.start_recording" = "Начать диктовку";
+"menu.stop_recording" = "Остановить и расшифровать";
 "menu.settings" = "Настройки…";
 "menu.quit" = "Выход";
-"menu.api_keys_missing" = "API-ключи не настроены";
-"menu.backend" = "Бэкенд:";
-"menu.rewrite" = "Переформулировка:";
-"menu.last_latency" = "Последняя задержка:";
-"menu.transcription" = "Транскрипция";
 "menu.last_result" = "Последний результат";
-"menu.raw" = "Сырой текст:";
-"menu.rewritten" = "Переформулировано:";
-"menu.dismiss" = "Закрыть";
 
 /* Settings – tabs */
 "settings.tab.general" = "Основные";
-"settings.tab.api_keys" = "API-ключи";
 "settings.tab.advanced" = "Дополнительно";
 
 /* Settings – general */
-"settings.transcription_backend" = "Бэкенд транскрипции";
-"settings.source_language" = "Язык записи";
-"settings.enable_rewriting" = "Включить переформулировку (Gemini)";
-"settings.rewrite_mode" = "Режим переформулировки";
-"settings.hotkey" = "Горячая клавиша";
-"settings.read_aloud" = "Прочитать вслух после вставки";
+"settings.source_language" = "Язык речи";
+"settings.rewrite_mode" = "Режим";
+"settings.hotkey" = "Сочетание клавиш";
+"settings.read_aloud" = "Читать результат вслух";
 
 /* Settings – languages */
-"lang.ru" = "Русский";
-"lang.en" = "Английский";
-"lang.de" = "Немецкий";
-"lang.fr" = "Французский";
-"lang.es" = "Испанский";
-"lang.ja" = "Японский";
-"lang.zh" = "Китайский";
-"lang.ko" = "Корейский";
-"lang.it" = "Итальянский";
-"lang.hi" = "Хинди";
-"lang.kk" = "Казахский";
 
 /* Settings – API keys */
-"settings.groq_section" = "Groq (Whisper ASR)";
-"settings.openrouter_section" = "OpenRouter (Gemini Flash)";
 "settings.api_key" = "API-ключ";
-"settings.groq_hint" = "Получите бесплатный ключ на console.groq.com";
-"settings.openrouter_hint" = "Получите бесплатный ключ на openrouter.ai";
-"settings.key_configured" = "Ключ настроен";
 
 /* Settings – advanced */
-"settings.max_recording" = "Макс. запись: %d сек";
-"settings.paste_delay" = "Задержка вставки: %d мс";
 
 /* Rewrite modes */
 "rewrite.cleanup" = "Исправление";
 "rewrite.punctuate" = "Пунктуация";
-"rewrite.translate" = "Перевод на английский";
 
 /* Audio source */
 "settings.audio_source" = "Источник звука";
 "audio_source.microphone" = "Микрофон";
 "audio_source.system_audio" = "Системный звук";
 "menu.start_capture" = "Захват системного звука";
-"floating.capturing" = "Захват…";
-"floating.copied" = "Скопировано ✓";
+"floating.copied" = "Скопировано";
 
 /* File transcription */
 "menu.transcribe_file" = "Транскрибировать файл…";
@@ -94,22 +61,17 @@
 "history.copy_tooltip" = "Копировать в буфер обмена";
 
 /* Result window */
-"result.title.mic" = "Транскрипция";
-"result.title.system" = "Транскрипция системного звука";
+"result.title.mic" = "Диктовка";
+"result.title.system" = "Системный звук";
 "result.title.file" = "Транскрипция файла";
 "result.copy" = "Копировать";
-"result.copied" = "Скопировано ✓";
-"result.chars" = "символов";
+"result.copied" = "Скопировано";
 
 /* Screen Recording permission */
-"menu.screen_recording_required" = "Требуется разрешение на запись экрана";
-"menu.screen_recording_hint" = "Необходимо для захвата системного звука";
 
 /* Permissions, code-signature diagnostics and the commit-based updater —
    added with the permission-persistence / updater work. Keys absent from a
    table fall back to the English default baked into the L() call sites. */
-"backend.gemini" = "Gemini 2.5 Flash (OpenRouter)";
-"backend.groq" = "Groq Whisper (бесплатно)";
 "common.no" = "Нет";
 "common.yes" = "Да";
 "error.permission_required" = "Для этого источника звука нужно разрешение «%@». Включите его в Системных настройках и повторите попытку.";
@@ -142,9 +104,6 @@
 "screen.error.missing_entitlements" = "В этой сборке отсутствует требуемый macOS entitlement записи экрана.";
 "screen.error.no_source" = "Система не сообщила ни об одном захватываемом дисплее.";
 "screen.error.user_declined" = "Доступ к записи экрана был отклонён.";
-"settings.openrouter_model" = "Идентификатор модели";
-"settings.openrouter_model_hint" = "По умолчанию: google/gemini-2.5-flash";
-"settings.openrouter_model_section" = "Модель OpenRouter";
 "settings.permissions.footer" = "WhisperFly запрашивает у macOS каждое из этих разрешений, когда оно впервые понадобится.";
 "settings.permissions.header" = "Необходимые разрешения";
 "settings.permissions.recheck" = "Проверить снова";
@@ -222,3 +181,183 @@
 "updates.status.idle" = "Ещё не проверялось";
 "updates.status.local_revision" = "Коммит этой сборки отсутствует в ветке — локальная или экспериментальная сборка";
 "updates.status.up_to_date" = "Актуальная версия";
+
+/* WhisperFly 3.0 — Liquid Glass UI, Groq / Gemini / OpenAI-compatible engines, onboarding */
+"rewrite.professional" = "Деловой стиль";
+"rewrite.translate_short" = "Перевод";
+"rewrite.custom" = "Свой вариант";
+"rewrite.cleanup.summary" = "Исправляет грамматику, убирает слова-паразиты и применяет устные поправки.";
+"rewrite.punctuate.summary" = "Расставляет знаки препинания и заглавные буквы, не меняя ни слова.";
+"rewrite.professional.summary" = "Превращает диктовку в чёткий и лаконичный рабочий текст.";
+"rewrite.translate.summary" = "Переводит сказанное на выбранный язык.";
+"rewrite.custom.summary" = "Следует вашим собственным инструкциям.";
+"status.inserted" = "Вставлено";
+"status.copied" = "Скопировано в буфер обмена";
+"notify.silent.title" = "Запись без звука";
+"notify.silent.body" = "Звуковой сигнал не был захвачен. Закройте другие приложения записи экрана, выключите и снова включите «Системный звук» или перезапустите WhisperFly.";
+"settings.tab.providers" = "Движки речи";
+"settings.tab.rewriting" = "AI-переформулировка";
+"settings.window_title" = "Настройки WhisperFly";
+"onboarding.window_title" = "Добро пожаловать в WhisperFly";
+"lang.auto" = "Автоопределение";
+"insertion.automatic" = "Автоматически";
+"insertion.paste" = "Всегда вставлять (⌘V)";
+"provider.custom" = "OpenAI-совместимый";
+"provider.custom_short" = "Свой";
+"provider.groq.tagline" = "Бесплатно · Whisper Large v3 Turbo · самый быстрый";
+"provider.gemini.tagline" = "Бесплатный тариф · Gemini 3.5 Transcribe · умное форматирование";
+"provider.openrouter.tagline" = "Gemini и другие модели по одному ключу";
+"provider.custom.tagline" = "OpenAI, локальный сервер Whisper или любой совместимый API";
+"model.note.fastest_free" = "Самая быстрая · бесплатно";
+"model.note.most_accurate" = "Самая точная · бесплатно";
+"model.note.gemini_transcribe" = "Специальная речевая модель · бесплатный тариф";
+"model.note.multimodal" = "Универсальная мультимодальная модель · бесплатный тариф";
+"model.note.fast_free" = "Быстрая · бесплатно";
+"model.note.smarter_free" = "Умнее · бесплатно";
+"model.note.multilingual_free" = "Сильная в разных языках · бесплатно";
+"model.note.fastest_free_tier" = "Самая быстрая · бесплатный тариф";
+"model.note.balanced_free_tier" = "Сбалансированная · бесплатный тариф";
+"model.note.smartest_flash" = "Самая умная Flash · бесплатный тариф";
+"model.note.fastest" = "Самая быстрая";
+"model.note.balanced" = "Сбалансированная";
+"model.note.smartest" = "Самая умная";
+"model.note.legacy" = "Прежняя по умолчанию";
+"settings.dictation" = "Диктовка";
+"settings.hold_to_talk" = "Удерживать для записи";
+"settings.hold_to_talk.hint" = "Удерживайте сочетание, пока говорите, и отпустите для расшифровки. Короткое нажатие по-прежнему запускает и останавливает запись.";
+"settings.output" = "Вывод";
+"settings.insertion" = "Вставка текста";
+"settings.insertion.hint" = "Выберите «Всегда вставлять», если текст не появляется в Slack, VS Code или некоторых браузерах.";
+"settings.sounds" = "Звуки начала и конца записи";
+"settings.system" = "Система";
+"settings.launch_at_login" = "Открывать при входе в систему";
+"settings.capture" = "Запись";
+"settings.max_recording_label" = "Максимальная длина записи";
+"settings.paste_delay_label" = "Задержка вставки";
+"settings.history" = "История";
+"settings.history.count" = "Сохранённые расшифровки";
+"settings.history.show" = "Показать историю";
+"settings.setup" = "Настройка";
+"settings.show_welcome" = "Показать приветственный гид";
+"history.clear_confirm" = "Удалить все расшифровки?";
+"settings.model" = "Модель";
+"settings.gemini_smart" = "Умная расшифровка";
+"settings.gemini_smart.hint" = "Gemini убирает слова-паразиты, применяет ваши устные поправки и форматирует списки, числа и даты. При включённой опции AI-очистка пропускается.";
+"settings.fallback" = "Переключаться на другой движок";
+"settings.fallback.hint" = "Если выбранный движок не сработал или исчерпал бесплатный лимит, попробовать следующий, для которого есть ключ.";
+"settings.transcription_engine" = "Движок расшифровки";
+"settings.api_keys" = "API-ключи";
+"settings.api_keys.footer" = "Ключи хранятся в настройках WhisperFly на этом Mac и отправляются только своему провайдеру. Одного бесплатного ключа Groq хватает и на расшифровку, и на AI-переформулировку.";
+"settings.custom.base_url" = "Базовый URL";
+"settings.custom.key_prompt" = "Необязательно для локальных серверов";
+"settings.custom.transcription_model" = "Модель расшифровки";
+"settings.custom.rewrite_model" = "Модель переформулировки";
+"settings.custom.header" = "OpenAI-совместимый сервер";
+"settings.custom.footer" = "Подходит для OpenAI, сервера whisper.cpp, LocalAI, серверов faster-whisper и других API с /audio/transcriptions и /chat/completions.";
+"settings.free" = "Бесплатно";
+"settings.get_key" = "Получить ключ";
+"settings.key_valid" = "Ключ работает";
+"settings.verify" = "Проверить";
+"settings.no_key" = "Ключа пока нет";
+"settings.model_suggestions" = "Рекомендуемые модели";
+"result.polished" = "Обработанный";
+"result.original" = "Исходный";
+"result.counts" = "%d слов · %d символов";
+"result.save" = "Сохранить…";
+"floating.polishing" = "Обработка…";
+"floating.inserting" = "Вставка…";
+"floating.dismiss" = "Закрыть";
+"floating.cancel_hint" = "Отменить (Esc)";
+"floating.stop_hint" = "Остановить и расшифровать";
+"floating.copied_hint" = "Нажмите ⌘V, чтобы вставить";
+"action.retry" = "Повторить";
+"action.add_key" = "Добавить ключ";
+"action.open_settings" = "Открыть настройки";
+"history.empty_hint" = "Здесь появятся ваши диктовки и расшифровки файлов.";
+"history.no_matches" = "Ничего не найдено";
+"history.no_matches_hint" = "Попробуйте другой запрос.";
+"history.clear_message" = "Это действие нельзя отменить.";
+"history.search" = "Поиск";
+"history.today" = "Сегодня";
+"history.yesterday" = "Вчера";
+"history.words" = "%d слов";
+"history.delete" = "Удалить";
+"history.open" = "Открыть";
+"settings.rewrite_enabled" = "Переформулировать расшифровки с помощью AI";
+"settings.rewrite_enabled.hint" = "Выполняется после расшифровки. При ошибке используется исходный текст.";
+"settings.target_language" = "Переводить на";
+"settings.custom_prompt" = "Инструкции";
+"settings.custom_prompt.hint" = "Например: «Пиши короткими предложениями и оформляй задачи в виде списка».";
+"settings.cleanup_skipped" = "Умная расшифровка Gemini уже очищает диктовку, поэтому этот шаг пропускается.";
+"settings.rewrite_engine" = "Движок";
+"settings.provider" = "Провайдер";
+"settings.rewrite_no_key" = "У %@ нет API-ключа, поэтому переформулировка пропускается.";
+"settings.vocabulary" = "Свой словарь";
+"settings.vocabulary.hint" = "Имена, термины и аббревиатуры через запятую или с новой строки — например, «Kubernetes, WhisperFly, Данияр». Передаются движку речи как подсказки, а переформулировщику — как написание, которое нужно сохранить.";
+"onboarding.welcome.title" = "Диктуйте в любом месте на Mac";
+"onboarding.welcome.body" = "Нажмите сочетание клавиш, говорите — и аккуратный текст появится в приложении, где вы печатаете. Бесплатные облачные движки, без загрузки моделей.";
+"onboarding.feature.dictate" = "Диктовка в любое приложение";
+"onboarding.feature.polish" = "AI-очистка и перевод";
+"onboarding.feature.system" = "Расшифровка системного звука и файлов";
+"onboarding.engine.title" = "Выберите бесплатный движок речи";
+"onboarding.engine.body" = "Оба бесплатны для повседневной диктовки. Groq быстрее всех; Gemini форматирует речь прямо при расшифровке. Второй можно добавить позже как запасной.";
+"onboarding.engine.key" = "API-ключ %@";
+"onboarding.engine.get_key" = "Создать бесплатный ключ";
+"onboarding.engine.groq_steps" = "Войдите на console.groq.com, откройте API Keys, создайте ключ и вставьте его сюда. Он начинается с gsk_.";
+"onboarding.engine.gemini_steps" = "Войдите на aistudio.google.com, выберите Get API key, создайте ключ и вставьте его сюда.";
+"onboarding.permissions.title" = "Разрешите доступ";
+"onboarding.permissions.body" = "macOS спросит о каждом разрешении один раз. Захват экрана нужен только для расшифровки системного звука.";
+"onboarding.try.title" = "Попробуйте";
+"onboarding.try.body_hold" = "Щёлкните в поле, затем удерживайте сочетание клавиш, говорите и отпустите. Короткое нажатие запускает и останавливает запись. Esc отменяет.";
+"onboarding.try.body_toggle" = "Щёлкните в поле, нажмите сочетание клавиш, говорите и нажмите его снова. Esc отменяет.";
+"onboarding.try.placeholder" = "Здесь появятся ваши слова…";
+"onboarding.back" = "Назад";
+"onboarding.skip" = "Пропустить";
+"onboarding.start" = "Начать";
+"onboarding.finish" = "Готово";
+"onboarding.continue" = "Продолжить";
+"menu.change" = "Изменить";
+"menu.setup.title" = "Добавьте бесплатный API-ключ";
+"menu.setup.body" = "WhisperFly нужен движок речи. У Groq и Google Gemini есть бесплатные тарифы — ключ создаётся за минуту.";
+"menu.setup.button" = "Настроить";
+"menu.setup.get_groq" = "Ключ Groq";
+"menu.engine" = "Движок речи";
+"menu.rewrite_title" = "AI-переформулировка";
+"rewrite.off" = "Выкл. — исходный текст";
+"menu.rewritten_chip" = "Обработано";
+"menu.recent" = "Недавние";
+"menu.see_all" = "Все";
+"menu.recent_hint" = "Нажмите, чтобы скопировать";
+"menu.transcribe_file_short" = "Файл…";
+"menu.drop_hint" = "Файл можно также перетащить сюда.";
+"menu.drop_title" = "Отпустите для расшифровки";
+"menu.hint.hold" = "Удерживайте %@ для записи или нажмите для старта и остановки · Esc отменяет";
+"menu.hint.toggle" = "Нажмите %@ для старта и остановки · Esc отменяет";
+"status.needs_setup" = "Нужен API-ключ";
+"rewrite.off_short" = "Выкл.";
+"audio.error.unreadable" = "Не удаётся прочитать этот файл.";
+"audio.error.no_track" = "В файле нет звуковой дорожки.";
+"audio.error.extract" = "Не удалось извлечь звук: %@";
+"provider.error.missing_key" = "Добавьте API-ключ %@ в «Настройки → Движки речи».";
+"provider.error.invalid_key" = "%@ отклонил API-ключ. Проверьте его в «Настройки → Движки речи».";
+"provider.error.rate_limited_after" = "Достигнут лимит запросов %@. Повторите через %d с.";
+"provider.error.rate_limited" = "Достигнут лимит запросов %@. Повторите чуть позже.";
+"provider.error.quota" = "Бесплатная квота %@ пока исчерпана.";
+"provider.error.model" = "%@ не предоставляет модель «%@».";
+"provider.error.bad_request" = "%@: %@";
+"provider.error.server" = "У %@ проблемы (HTTP %d).";
+"provider.error.network" = "Не удалось подключиться к %@: %@";
+"provider.error.empty" = "%@ не вернул текст.";
+"provider.error.too_large" = "Запись больше %d МБ, которые принимает %@.";
+"error.not_configured" = "Добавьте бесплатный API-ключ %@, чтобы начать диктовку.";
+"fn.conflict.input_source" = "macOS также переключает источник ввода при нажатии fn.";
+"fn.conflict.emoji" = "macOS также открывает панель эмодзи при нажатии fn.";
+"fn.conflict.dictation" = "macOS также запускает собственную диктовку при нажатии fn.";
+"fn.conflict.default" = "macOS может также реагировать на клавишу fn (эмодзи или смена источника ввода).";
+"fn.conflict.fix" = "В настройках клавиатуры выберите «Нажатие 🌐: Ничего не делать».";
+"fn.conflict.open" = "Открыть «Клавиатура»";
+"menu.hint.fn_hold" = "Удерживайте fn для диктовки или нажмите fn для старта и остановки · Esc отменяет";
+"menu.hint.fn_toggle" = "Нажмите fn для старта и остановки диктовки · Esc отменяет";
+"settings.fn.hint" = "Одна клавиша fn всегда запускает диктовку с микрофона. Чтобы видеть клавишу, WhisperFly нужно разрешение «Универсальный доступ». Сочетания вроде fn+Delete продолжают работать. Только встроенные и клавиатуры Apple — для других выберите сочетание клавиш.";
+"onboarding.try.body_fn_hold" = "Щёлкните в поле, удерживайте fn, говорите и отпустите. Короткое нажатие fn запускает и останавливает запись. Esc отменяет.";
+"onboarding.try.body_fn_toggle" = "Щёлкните в поле, нажмите fn, говорите и нажмите fn ещё раз. Esc отменяет.";

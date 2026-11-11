@@ -1,40 +1,66 @@
 import AppKit
 import SwiftUI
 
+/// A floating glass window showing one transcription in full.
 @MainActor
 final class TranscriptionResultPanel {
-    private var panel: NSPanel?
+    private var panel: GlassPanel?
 
-    func show(text: String, source: TranscriptionEntry.Source, fileName: String? = nil) {
+    func show(entry: TranscriptionEntry) {
         close()
 
-        let view = TranscriptionResultView(
-            text: text,
-            source: source,
-            fileName: fileName,
-            onClose: { [weak self] in self?.close() }
-        )
-        let hosting = NSHostingView(rootView: view)
-        hosting.frame = NSRect(x: 0, y: 0, width: 380, height: 280)
+        let size = NSSize(width: 460, height: 360)
+        let p = GlassPanel(size: size)
+        p.minSize = NSSize(width: 360, height: 240)
+        p.onCancel = { [weak self] in self?.close() }
 
-        let p = NSPanel(
-            contentRect: NSRect(x: 0, y: 0, width: 380, height: 280),
-            styleMask: [.titled, .closable, .nonactivatingPanel, .hudWindow],
-            backing: .buffered,
-            defer: false
-        )
-        p.title = "WhisperFly"
-        p.isFloatingPanel = true
-        p.level = .floating
-        p.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-        p.contentView = hosting
-        p.isReleasedWhenClosed = false
+        let view = TranscriptionResultView(entry: entry, onClose: { [weak self] in self?.close() })
+        let hosting = FirstMouseHostingView(rootView: view)
+        p.contentView = GlassWindowContent.make(hosting: hosting, cornerRadius: 26)
         // `NSWindow.center()` targets the primary screen; the result belongs on
-        // the display the user dictated on.
+        // the display the user is working on.
         ScreenPlacement.center(p)
 
         self.panel = p
         p.orderFrontRegardless()
+        p.makeKey()
+    }
+
+    func close() {
+        panel?.orderOut(nil)
+        panel = nil
+    }
+}
+
+/// The floating glass history browser.
+@MainActor
+final class HistoryPanel {
+    private var panel: GlassPanel?
+
+    func toggle(controller: AppController, resultPanel: TranscriptionResultPanel) {
+        if let panel, panel.isVisible {
+            close()
+            return
+        }
+        close()
+
+        let size = NSSize(width: 460, height: 580)
+        let p = GlassPanel(size: size)
+        p.minSize = NSSize(width: 380, height: 360)
+        p.onCancel = { [weak self] in self?.close() }
+
+        let view = HistoryView(
+            history: controller.history,
+            onSelect: { entry in resultPanel.show(entry: entry) },
+            onClose: { [weak self] in self?.close() }
+        )
+        let hosting = FirstMouseHostingView(rootView: view)
+        p.contentView = GlassWindowContent.make(hosting: hosting, cornerRadius: 26)
+        ScreenPlacement.center(p)
+
+        self.panel = p
+        p.orderFrontRegardless()
+        p.makeKey()
     }
 
     func close() {

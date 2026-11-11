@@ -12,6 +12,7 @@
 #   ./scripts/build-app.sh --universal           # universal (arm64 + x86_64) binary
 #   ./scripts/build-app.sh --version 2.1.0       # override the marketing version
 #   ./scripts/build-app.sh --no-sign             # skip codesigning entirely
+#   WHISPERFLY_SCRATCH_PATH=/tmp/wf ./scripts/build-app.sh   # build outside the checkout
 #
 # This is also what the in-app updater invokes when rebuilding a source checkout
 # (UpdateInstaller.rebuildFromSource), so it must work in a fresh clone with
@@ -47,6 +48,12 @@ cd "$REPO_ROOT"
 # --- Build -------------------------------------------------------------------
 
 SWIFT_FLAGS=(-c "$BUILD_CONFIG")
+# Optional build directory outside the checkout. SwiftPM keeps a SQLite build
+# database in .build, and a checkout inside an iCloud-synced folder (~/Documents
+# or ~/Desktop with "Desktop & Documents" on) can fail it with "disk I/O error".
+if [[ -n "${WHISPERFLY_SCRATCH_PATH:-}" ]]; then
+    SWIFT_FLAGS+=(--scratch-path "$WHISPERFLY_SCRATCH_PATH")
+fi
 if [[ $UNIVERSAL -eq 1 ]]; then
     SWIFT_FLAGS+=(--arch arm64 --arch x86_64)
 fi

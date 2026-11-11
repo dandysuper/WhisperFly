@@ -7,76 +7,43 @@
 "status.error" = "Erreur : %@";
 
 /* Floating status view */
-"floating.listening" = "Écoute…";
 "floating.transcribing" = "Transcription…";
-"floating.rewriting" = "Réécriture…";
-"floating.done" = "Terminé ✓";
+"floating.done" = "Terminé";
 
 /* Menu bar */
 "menu.start_recording" = "Démarrer l'enregistrement";
 "menu.stop_recording" = "Arrêter l'enregistrement";
 "menu.settings" = "Préférences…";
 "menu.quit" = "Quitter";
-"menu.api_keys_missing" = "Clés API non configurées";
-"menu.backend" = "Backend :";
-"menu.rewrite" = "Réécriture :";
-"menu.last_latency" = "Dernière latence :";
-"menu.transcription" = "Transcription";
 "menu.last_result" = "Dernier résultat";
-"menu.raw" = "Brut :";
-"menu.rewritten" = "Réécrit :";
-"menu.dismiss" = "Fermer";
 
 /* Settings – tabs */
 "settings.tab.general" = "Général";
-"settings.tab.api_keys" = "Clés API";
 "settings.tab.advanced" = "Avancé";
 
 /* Settings – general */
-"settings.transcription_backend" = "Backend de transcription";
 "settings.source_language" = "Langue source";
-"settings.enable_rewriting" = "Activer la réécriture Gemini";
 "settings.rewrite_mode" = "Mode de réécriture";
 "settings.hotkey" = "Raccourci clavier";
 "settings.read_aloud" = "Lire à voix haute après collage";
 
 /* Settings – languages */
-"lang.ru" = "Russe";
-"lang.en" = "Anglais";
-"lang.de" = "Allemand";
-"lang.fr" = "Français";
-"lang.es" = "Espagnol";
-"lang.ja" = "Japonais";
-"lang.zh" = "Chinois";
-"lang.ko" = "Coréen";
-"lang.it" = "Italien";
-"lang.hi" = "Hindi";
-"lang.kk" = "Kazakh";
 
 /* Settings – API keys */
-"settings.groq_section" = "Groq (Whisper ASR)";
-"settings.openrouter_section" = "OpenRouter (Gemini Flash)";
 "settings.api_key" = "Clé API";
-"settings.groq_hint" = "Clé gratuite sur console.groq.com";
-"settings.openrouter_hint" = "Clé gratuite sur openrouter.ai";
-"settings.key_configured" = "Clé configurée";
 
 /* Settings – advanced */
-"settings.max_recording" = "Enreg. max : %d s";
-"settings.paste_delay" = "Délai de collage : %d ms";
 
 /* Rewrite modes */
 "rewrite.cleanup" = "Nettoyage";
 "rewrite.punctuate" = "Ponctuation";
-"rewrite.translate" = "Traduire en anglais";
 
 /* Audio source */
 "settings.audio_source" = "Source audio";
 "audio_source.microphone" = "Microphone";
 "audio_source.system_audio" = "Audio système";
 "menu.start_capture" = "Capturer audio système";
-"floating.capturing" = "Capture…";
-"floating.copied" = "Copié ✓";
+"floating.copied" = "Copié";
 
 /* File transcription */
 "menu.transcribe_file" = "Transcrire un fichier…";
@@ -98,18 +65,13 @@
 "result.title.system" = "Transcription audio système";
 "result.title.file" = "Transcription de fichier";
 "result.copy" = "Copier";
-"result.copied" = "Copié ✓";
-"result.chars" = "caractères";
+"result.copied" = "Copié";
 
 /* Screen Recording permission */
-"menu.screen_recording_required" = "Autorisation d'enregistrement d'écran requise";
-"menu.screen_recording_hint" = "Nécessaire pour capturer l'audio système";
 
 /* Permissions, code-signature diagnostics and the commit-based updater —
    added with the permission-persistence / updater work. Keys absent from a
    table fall back to the English default baked into the L() call sites. */
-"backend.gemini" = "Gemini 2.5 Flash (OpenRouter)";
-"backend.groq" = "Groq Whisper (gratuit)";
 "common.no" = "Non";
 "common.yes" = "Oui";
 "error.permission_required" = "Cette source audio nécessite l'autorisation %@. Activez-la dans Réglages Système, puis réessayez.";
@@ -142,9 +104,6 @@
 "screen.error.missing_entitlements" = "Cette version ne dispose pas du privilège d'Enregistrement de l'écran exigé par macOS.";
 "screen.error.no_source" = "Aucun écran capturable n'a été signalé par le système.";
 "screen.error.user_declined" = "L'accès à l'Enregistrement de l'écran a été refusé.";
-"settings.openrouter_model" = "Identifiant du modèle";
-"settings.openrouter_model_hint" = "Par défaut : google/gemini-2.5-flash";
-"settings.openrouter_model_section" = "Modèle OpenRouter";
 "settings.permissions.footer" = "WhisperFly demande à macOS chacune de ces autorisations la première fois qu'il en a besoin.";
 "settings.permissions.header" = "Autorisations requises";
 "settings.permissions.recheck" = "Revérifier";

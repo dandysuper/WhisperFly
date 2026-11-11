@@ -7,76 +7,43 @@
 "status.error" = "Error: %@";
 
 /* Floating status view */
-"floating.listening" = "Listening…";
 "floating.transcribing" = "Transcribing…";
-"floating.rewriting" = "Rewriting…";
-"floating.done" = "Done ✓";
+"floating.done" = "Done";
 
 /* Menu bar */
-"menu.start_recording" = "Start Recording";
-"menu.stop_recording" = "Stop Recording";
+"menu.start_recording" = "Start Dictation";
+"menu.stop_recording" = "Stop & Transcribe";
 "menu.settings" = "Settings…";
 "menu.quit" = "Quit";
-"menu.api_keys_missing" = "API keys not configured";
-"menu.backend" = "Backend:";
-"menu.rewrite" = "Rewrite:";
-"menu.last_latency" = "Last latency:";
-"menu.transcription" = "Transcription";
 "menu.last_result" = "Last Result";
-"menu.raw" = "Raw:";
-"menu.rewritten" = "Rewritten:";
-"menu.dismiss" = "Dismiss";
 
 /* Settings – tabs */
 "settings.tab.general" = "General";
-"settings.tab.api_keys" = "API Keys";
 "settings.tab.advanced" = "Advanced";
 
 /* Settings – general */
-"settings.transcription_backend" = "Transcription Backend";
-"settings.source_language" = "Source Language";
-"settings.enable_rewriting" = "Enable Gemini Rewriting";
-"settings.rewrite_mode" = "Rewrite Mode";
-"settings.hotkey" = "Hotkey";
-"settings.read_aloud" = "Read Aloud After Pasting";
+"settings.source_language" = "Spoken Language";
+"settings.rewrite_mode" = "Mode";
+"settings.hotkey" = "Shortcut";
+"settings.read_aloud" = "Read result aloud";
 
 /* Settings – languages */
-"lang.ru" = "Russian";
-"lang.en" = "English";
-"lang.de" = "German";
-"lang.fr" = "French";
-"lang.es" = "Spanish";
-"lang.ja" = "Japanese";
-"lang.zh" = "Chinese";
-"lang.ko" = "Korean";
-"lang.it" = "Italian";
-"lang.hi" = "Hindi";
-"lang.kk" = "Kazakh";
 
 /* Settings – API keys */
-"settings.groq_section" = "Groq (Whisper ASR)";
-"settings.openrouter_section" = "OpenRouter (Gemini Flash)";
 "settings.api_key" = "API Key";
-"settings.groq_hint" = "Get free key at console.groq.com";
-"settings.openrouter_hint" = "Get free key at openrouter.ai";
-"settings.key_configured" = "Key configured";
 
 /* Settings – advanced */
-"settings.max_recording" = "Max Recording: %ds";
-"settings.paste_delay" = "Paste Delay: %dms";
 
 /* Rewrite modes */
 "rewrite.cleanup" = "Cleanup";
 "rewrite.punctuate" = "Punctuate";
-"rewrite.translate" = "Translate to English";
 
 /* Audio source */
 "settings.audio_source" = "Audio Source";
 "audio_source.microphone" = "Microphone";
 "audio_source.system_audio" = "System Audio";
 "menu.start_capture" = "Capture System Audio";
-"floating.capturing" = "Capturing…";
-"floating.copied" = "Copied ✓";
+"floating.copied" = "Copied";
 
 /* File transcription */
 "menu.transcribe_file" = "Transcribe File…";
@@ -94,22 +61,17 @@
 "history.copy_tooltip" = "Copy to clipboard";
 
 /* Result window */
-"result.title.mic" = "Transcription";
-"result.title.system" = "System Audio Transcription";
+"result.title.mic" = "Dictation";
+"result.title.system" = "System Audio";
 "result.title.file" = "File Transcription";
 "result.copy" = "Copy";
-"result.copied" = "Copied ✓";
-"result.chars" = "chars";
+"result.copied" = "Copied";
 
 /* Screen Recording permission */
-"menu.screen_recording_required" = "Screen Recording permission required";
-"menu.screen_recording_hint" = "Needed to capture system audio";
 
 /* Permissions, code-signature diagnostics and the commit-based updater —
    added with the permission-persistence / updater work. Keys absent from a
    table fall back to the English default baked into the L() call sites. */
-"backend.gemini" = "Gemini 2.5 Flash (OpenRouter)";
-"backend.groq" = "Groq Whisper (Free)";
 "common.no" = "No";
 "common.yes" = "Yes";
 "error.permission_required" = "%@ permission is required for this audio source. Enable it in System Settings, then try again.";
@@ -142,9 +104,6 @@
 "screen.error.missing_entitlements" = "This build is missing the Screen Recording entitlement macOS requires.";
 "screen.error.no_source" = "No capturable display was reported by the system.";
 "screen.error.user_declined" = "Screen Recording access was declined.";
-"settings.openrouter_model" = "Model ID";
-"settings.openrouter_model_hint" = "Default: google/gemini-2.5-flash";
-"settings.openrouter_model_section" = "OpenRouter Model";
 "settings.permissions.footer" = "WhisperFly asks macOS for each of these the first time it needs them.";
 "settings.permissions.header" = "Required Permissions";
 "settings.permissions.recheck" = "Check Again";
@@ -222,3 +181,183 @@
 "updates.status.idle" = "Not checked yet";
 "updates.status.local_revision" = "This build's commit is not on the branch — a local or experimental build";
 "updates.status.up_to_date" = "Up to date";
+
+/* WhisperFly 3.0 — Liquid Glass UI, Groq / Gemini / OpenAI-compatible engines, onboarding */
+"rewrite.professional" = "Professional";
+"rewrite.translate_short" = "Translate";
+"rewrite.custom" = "Custom";
+"rewrite.cleanup.summary" = "Fixes grammar, removes filler words and applies spoken corrections.";
+"rewrite.punctuate.summary" = "Adds punctuation and capitals without changing a single word.";
+"rewrite.professional.summary" = "Turns dictation into clear, concise work-ready prose.";
+"rewrite.translate.summary" = "Translates what you said into your target language.";
+"rewrite.custom.summary" = "Follows your own instructions.";
+"status.inserted" = "Inserted";
+"status.copied" = "Copied to clipboard";
+"notify.silent.title" = "Silent Recording Detected";
+"notify.silent.body" = "No audio signal was captured. Quit other screen-recording apps, toggle System Audio off and on, or restart WhisperFly.";
+"settings.tab.providers" = "Speech Engines";
+"settings.tab.rewriting" = "AI Rewriting";
+"settings.window_title" = "WhisperFly Settings";
+"onboarding.window_title" = "Welcome to WhisperFly";
+"lang.auto" = "Auto-detect";
+"insertion.automatic" = "Automatic";
+"insertion.paste" = "Always paste (⌘V)";
+"provider.custom" = "OpenAI-compatible";
+"provider.custom_short" = "Custom";
+"provider.groq.tagline" = "Free · Whisper Large v3 Turbo · fastest";
+"provider.gemini.tagline" = "Free tier · Gemini 3.5 Transcribe · smart formatting";
+"provider.openrouter.tagline" = "Gemini and other models through one key";
+"provider.custom.tagline" = "OpenAI, a local Whisper server, or any compatible API";
+"model.note.fastest_free" = "Fastest · free";
+"model.note.most_accurate" = "Most accurate · free";
+"model.note.gemini_transcribe" = "Dedicated speech model · free tier";
+"model.note.multimodal" = "General multimodal model · free tier";
+"model.note.fast_free" = "Fast · free";
+"model.note.smarter_free" = "Smarter · free";
+"model.note.multilingual_free" = "Strong multilingual · free";
+"model.note.fastest_free_tier" = "Fastest · free tier";
+"model.note.balanced_free_tier" = "Balanced · free tier";
+"model.note.smartest_flash" = "Smartest Flash · free tier";
+"model.note.fastest" = "Fastest";
+"model.note.balanced" = "Balanced";
+"model.note.smartest" = "Smartest";
+"model.note.legacy" = "Previous default";
+"settings.dictation" = "Dictation";
+"settings.hold_to_talk" = "Hold to talk";
+"settings.hold_to_talk.hint" = "Hold the shortcut while speaking and release to transcribe. A quick tap still starts and stops recording.";
+"settings.output" = "Output";
+"settings.insertion" = "Insert text";
+"settings.insertion.hint" = "Choose “Always paste” if text does not appear in apps like Slack, VS Code or some browsers.";
+"settings.sounds" = "Play start and stop sounds";
+"settings.system" = "System";
+"settings.launch_at_login" = "Open at login";
+"settings.capture" = "Capture";
+"settings.max_recording_label" = "Maximum recording length";
+"settings.paste_delay_label" = "Paste delay";
+"settings.history" = "History";
+"settings.history.count" = "Saved transcriptions";
+"settings.history.show" = "Show History";
+"settings.setup" = "Setup";
+"settings.show_welcome" = "Show Welcome Guide";
+"history.clear_confirm" = "Delete all transcriptions?";
+"settings.model" = "Model";
+"settings.gemini_smart" = "Smart transcription";
+"settings.gemini_smart.hint" = "Gemini removes filler words, applies your spoken corrections and formats lists, numbers and dates. AI Cleanup is skipped when this is on.";
+"settings.fallback" = "Fall back to another engine";
+"settings.fallback.hint" = "If the selected engine fails or hits its free-tier limit, try the next one you have a key for.";
+"settings.transcription_engine" = "Transcription Engine";
+"settings.api_keys" = "API Keys";
+"settings.api_keys.footer" = "Keys are stored in WhisperFly's preferences on this Mac and sent only to their own provider. One free Groq key covers both transcription and AI rewriting.";
+"settings.custom.base_url" = "Base URL";
+"settings.custom.key_prompt" = "Optional for local servers";
+"settings.custom.transcription_model" = "Transcription model";
+"settings.custom.rewrite_model" = "Rewrite model";
+"settings.custom.header" = "OpenAI-Compatible Server";
+"settings.custom.footer" = "Works with OpenAI, whisper.cpp's server, LocalAI, faster-whisper servers and other APIs that offer /audio/transcriptions and /chat/completions.";
+"settings.free" = "Free";
+"settings.get_key" = "Get Key";
+"settings.key_valid" = "Key works";
+"settings.verify" = "Verify";
+"settings.no_key" = "No key yet";
+"settings.model_suggestions" = "Suggested models";
+"result.polished" = "Polished";
+"result.original" = "Original";
+"result.counts" = "%d words · %d characters";
+"result.save" = "Save…";
+"floating.polishing" = "Polishing…";
+"floating.inserting" = "Inserting…";
+"floating.dismiss" = "Dismiss";
+"floating.cancel_hint" = "Cancel (Esc)";
+"floating.stop_hint" = "Stop and transcribe";
+"floating.copied_hint" = "Press ⌘V to paste";
+"action.retry" = "Retry";
+"action.add_key" = "Add Key";
+"action.open_settings" = "Open Settings";
+"history.empty_hint" = "Your dictations and file transcriptions will appear here.";
+"history.no_matches" = "No matches";
+"history.no_matches_hint" = "Try a different search.";
+"history.clear_message" = "This cannot be undone.";
+"history.search" = "Search";
+"history.today" = "Today";
+"history.yesterday" = "Yesterday";
+"history.words" = "%d words";
+"history.delete" = "Delete";
+"history.open" = "Open";
+"settings.rewrite_enabled" = "Rewrite transcripts with AI";
+"settings.rewrite_enabled.hint" = "Runs after transcription. If it fails, the original transcript is used.";
+"settings.target_language" = "Translate into";
+"settings.custom_prompt" = "Instructions";
+"settings.custom_prompt.hint" = "For example: “Write in British English, use short sentences, and format action items as a checklist.”";
+"settings.cleanup_skipped" = "Gemini smart transcription already cleans up dictation, so this pass is skipped.";
+"settings.rewrite_engine" = "Engine";
+"settings.provider" = "Provider";
+"settings.rewrite_no_key" = "%@ has no API key, so rewriting is skipped.";
+"settings.vocabulary" = "Custom Vocabulary";
+"settings.vocabulary.hint" = "Names, product terms and acronyms, separated by commas or new lines — e.g. “Kubernetes, WhisperFly, Daniyar”. Sent to the speech engine as hints and to the rewriter as spellings to keep.";
+"onboarding.welcome.title" = "Dictate anywhere on your Mac";
+"onboarding.welcome.body" = "Press a shortcut, speak, and polished text appears in whatever app you're typing in. Free cloud speech engines, no model downloads.";
+"onboarding.feature.dictate" = "Dictate into any app";
+"onboarding.feature.polish" = "AI cleanup & translation";
+"onboarding.feature.system" = "Transcribe system audio & files";
+"onboarding.engine.title" = "Choose a free speech engine";
+"onboarding.engine.body" = "Both are free for everyday dictation. Groq is the fastest; Gemini formats your speech as it transcribes. You can add the other later as a fallback.";
+"onboarding.engine.key" = "%@ API key";
+"onboarding.engine.get_key" = "Create a free key";
+"onboarding.engine.groq_steps" = "Sign in at console.groq.com, open API Keys, create a key and paste it here. It starts with gsk_.";
+"onboarding.engine.gemini_steps" = "Sign in at aistudio.google.com, choose Get API key, create a key and paste it here.";
+"onboarding.permissions.title" = "Allow access";
+"onboarding.permissions.body" = "macOS asks for each of these once. Screen Recording is only needed to transcribe system audio.";
+"onboarding.try.title" = "Try it";
+"onboarding.try.body_hold" = "Click in the box, then hold the shortcut, speak, and let go. A quick tap starts and stops recording instead. Esc cancels.";
+"onboarding.try.body_toggle" = "Click in the box, press the shortcut, speak, and press it again. Esc cancels.";
+"onboarding.try.placeholder" = "Your words will appear here…";
+"onboarding.back" = "Back";
+"onboarding.skip" = "Skip";
+"onboarding.start" = "Get Started";
+"onboarding.finish" = "Finish";
+"onboarding.continue" = "Continue";
+"menu.change" = "Change";
+"menu.setup.title" = "Add a free API key";
+"menu.setup.body" = "WhisperFly needs a speech engine. Groq and Google Gemini both have free tiers — a key takes a minute to create.";
+"menu.setup.button" = "Set Up";
+"menu.setup.get_groq" = "Get Groq Key";
+"menu.engine" = "Speech engine";
+"menu.rewrite_title" = "AI rewrite";
+"rewrite.off" = "Off — raw transcript";
+"menu.rewritten_chip" = "Rewritten";
+"menu.recent" = "Recent";
+"menu.see_all" = "See All";
+"menu.recent_hint" = "Click to copy";
+"menu.transcribe_file_short" = "File…";
+"menu.drop_hint" = "You can also drop a file here.";
+"menu.drop_title" = "Drop to transcribe";
+"menu.hint.hold" = "Hold %@ to talk, or tap to start and stop · Esc cancels";
+"menu.hint.toggle" = "Press %@ to start and stop · Esc cancels";
+"status.needs_setup" = "Needs an API key";
+"rewrite.off_short" = "Off";
+"audio.error.unreadable" = "This file cannot be read.";
+"audio.error.no_track" = "This file has no audio track.";
+"audio.error.extract" = "Audio extraction failed: %@";
+"provider.error.missing_key" = "Add a %@ API key in Settings → Providers.";
+"provider.error.invalid_key" = "%@ rejected the API key. Check it in Settings → Providers.";
+"provider.error.rate_limited_after" = "%@ rate limit reached. Try again in %ds.";
+"provider.error.rate_limited" = "%@ rate limit reached. Try again shortly.";
+"provider.error.quota" = "%@ free quota is used up for now.";
+"provider.error.model" = "%@ does not offer the model “%@”.";
+"provider.error.bad_request" = "%@: %@";
+"provider.error.server" = "%@ is having trouble (HTTP %d).";
+"provider.error.network" = "Could not reach %@: %@";
+"provider.error.empty" = "%@ returned no text.";
+"provider.error.too_large" = "This recording is larger than the %d MB %@ accepts.";
+"error.not_configured" = "Add a free %@ API key to start dictating.";
+"fn.conflict.input_source" = "macOS also switches the input source when you press fn.";
+"fn.conflict.emoji" = "macOS also opens the emoji picker when you press fn.";
+"fn.conflict.dictation" = "macOS also starts its own Dictation when you press fn.";
+"fn.conflict.default" = "macOS may also act on the fn key (emoji picker or input source).";
+"fn.conflict.fix" = "Set “Press 🌐 key to” to “Do Nothing” in Keyboard settings.";
+"fn.conflict.open" = "Open Keyboard";
+"menu.hint.fn_hold" = "Hold fn to dictate, or tap fn to start and stop · Esc cancels";
+"menu.hint.fn_toggle" = "Tap fn to start and stop dictation · Esc cancels";
+"settings.fn.hint" = "fn on its own always dictates from the microphone. WhisperFly needs Accessibility permission to see the key. Combinations like fn+Delete keep working. Built-in and Apple keyboards only — choose a key combination for other keyboards.";
+"onboarding.try.body_fn_hold" = "Click in the box, then hold fn, speak, and let go. A quick tap on fn starts and stops recording instead. Esc cancels.";
+"onboarding.try.body_fn_toggle" = "Click in the box, tap fn, speak, and tap fn again. Esc cancels.";

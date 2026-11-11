@@ -140,9 +140,6 @@ struct UpdatesView: View {
             }
         }
         .formStyle(.grouped)
-        .onChange(of: controller.settings) { _, _ in
-            controller.saveSettings()
-        }
     }
 
     // MARK: - Pieces

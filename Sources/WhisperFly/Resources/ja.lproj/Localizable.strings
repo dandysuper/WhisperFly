@@ -7,76 +7,43 @@
 "status.error" = "エラー: %@";
 
 /* Floating status view */
-"floating.listening" = "聞いています…";
 "floating.transcribing" = "文字起こし中…";
-"floating.rewriting" = "書き直し中…";
-"floating.done" = "完了 ✓";
+"floating.done" = "完了";
 
 /* Menu bar */
 "menu.start_recording" = "録音開始";
 "menu.stop_recording" = "録音停止";
 "menu.settings" = "設定…";
 "menu.quit" = "終了";
-"menu.api_keys_missing" = "APIキーが設定されていません";
-"menu.backend" = "バックエンド:";
-"menu.rewrite" = "書き直し:";
-"menu.last_latency" = "最終レイテンシ:";
-"menu.transcription" = "文字起こし";
 "menu.last_result" = "最終結果";
-"menu.raw" = "元のテキスト:";
-"menu.rewritten" = "書き直し済み:";
-"menu.dismiss" = "閉じる";
 
 /* Settings – tabs */
 "settings.tab.general" = "一般";
-"settings.tab.api_keys" = "APIキー";
 "settings.tab.advanced" = "詳細";
 
 /* Settings – general */
-"settings.transcription_backend" = "文字起こしバックエンド";
 "settings.source_language" = "ソース言語";
-"settings.enable_rewriting" = "Gemini書き直しを有効にする";
 "settings.rewrite_mode" = "書き直しモード";
 "settings.hotkey" = "ホットキー";
 "settings.read_aloud" = "貼り付け後に読み上げる";
 
 /* Settings – languages */
-"lang.ru" = "ロシア語";
-"lang.en" = "英語";
-"lang.de" = "ドイツ語";
-"lang.fr" = "フランス語";
-"lang.es" = "スペイン語";
-"lang.ja" = "日本語";
-"lang.zh" = "中国語";
-"lang.ko" = "韓国語";
-"lang.it" = "イタリア語";
-"lang.hi" = "ヒンディー語";
-"lang.kk" = "カザフ語";
 
 /* Settings – API keys */
-"settings.groq_section" = "Groq (Whisper ASR)";
-"settings.openrouter_section" = "OpenRouter (Gemini Flash)";
 "settings.api_key" = "APIキー";
-"settings.groq_hint" = "console.groq.comで無料キーを取得";
-"settings.openrouter_hint" = "openrouter.aiで無料キーを取得";
-"settings.key_configured" = "キー設定済み";
 
 /* Settings – advanced */
-"settings.max_recording" = "最大録音時間: %d秒";
-"settings.paste_delay" = "貼り付け遅延: %dms";
 
 /* Rewrite modes */
 "rewrite.cleanup" = "クリーンアップ";
 "rewrite.punctuate" = "句読点";
-"rewrite.translate" = "英語に翻訳";
 
 /* Audio source */
 "settings.audio_source" = "音声ソース";
 "audio_source.microphone" = "マイク";
 "audio_source.system_audio" = "システム音声";
 "menu.start_capture" = "システム音声をキャプチャ";
-"floating.capturing" = "キャプチャ中…";
-"floating.copied" = "コピー済 ✓";
+"floating.copied" = "コピー済";
 
 /* File transcription */
 "menu.transcribe_file" = "ファイルを文字起こし…";
@@ -98,18 +65,13 @@
 "result.title.system" = "システムオーディオ文字起こし";
 "result.title.file" = "ファイル文字起こし";
 "result.copy" = "コピー";
-"result.copied" = "コピー済み ✓";
-"result.chars" = "文字";
+"result.copied" = "コピー済み";
 
 /* Screen Recording permission */
-"menu.screen_recording_required" = "画面収録の許可が必要です";
-"menu.screen_recording_hint" = "システムオーディオのキャプチャに必要";
 
 /* Permissions, code-signature diagnostics and the commit-based updater —
    added with the permission-persistence / updater work. Keys absent from a
    table fall back to the English default baked into the L() call sites. */
-"backend.gemini" = "Gemini 2.5 Flash (OpenRouter)";
-"backend.groq" = "Groq Whisper（無料）";
 "common.no" = "いいえ";
 "common.yes" = "はい";
 "error.permission_required" = "このオーディオソースには「%@」の権限が必要です。システム設定で有効にしてから、もう一度お試しください。";
@@ -142,9 +104,6 @@
 "screen.error.missing_entitlements" = "このビルドには macOS が要求する画面収録のエンタイトルメントがありません。";
 "screen.error.no_source" = "キャプチャ可能なディスプレイがシステムから報告されませんでした。";
 "screen.error.user_declined" = "画面収録へのアクセスが拒否されました。";
-"settings.openrouter_model" = "モデル ID";
-"settings.openrouter_model_hint" = "デフォルト：google/gemini-2.5-flash";
-"settings.openrouter_model_section" = "OpenRouter モデル";
 "settings.permissions.footer" = "WhisperFly は、これらの権限を初めて必要とした時点で macOS に要求します。";
 "settings.permissions.header" = "必要な権限";
 "settings.permissions.recheck" = "再確認";

@@ -40,66 +40,77 @@ extension AppSettings {
         }
     }
 
-    /// Which speech-to-text service performs the transcription.
-    enum TranscriptionBackend: String, Codable, Sendable, CaseIterable, Identifiable {
-        case groqWhisper
-        case gemini
+    /// How dictated text reaches the focused app.
+    enum InsertionMethod: String, Codable, Sendable, CaseIterable, Identifiable {
+        /// Write through the Accessibility API, fall back to paste.
+        case automatic
+        /// Always paste with ⌘V. Works in apps (Electron, some browsers) that
+        /// accept Accessibility writes without actually applying them.
+        case paste
 
         var id: String { rawValue }
 
-        var displayName: String {
+        var localizedName: String {
             switch self {
-            case .groqWhisper: return L("backend.groq", "Groq Whisper (Free)")
-            case .gemini:      return L("backend.gemini", "Gemini 2.5 Flash (OpenRouter)")
-            }
-        }
-
-        /// Maps the display-string raw values used up to release 2.x, including
-        /// the `NIM Canary` backend that no longer exists — an install that had
-        /// it selected falls back to Groq rather than losing every other setting.
-        static func fromPersisted(_ raw: String) -> TranscriptionBackend? {
-            if let value = TranscriptionBackend(rawValue: raw) { return value }
-            switch raw {
-            case "Groq Whisper (Free)":                 return .groqWhisper
-            case "Gemini 2.5 Flash (OpenRouter)":       return .gemini
-            case "NIM Canary", "NVIDIA NIM Canary":     return .groqWhisper
-            default:                                    return nil
+            case .automatic: return L("insertion.automatic", "Automatic")
+            case .paste:     return L("insertion.paste", "Always paste (⌘V)")
             }
         }
     }
 
     /// The global shortcut that starts and stops recording.
     ///
-    /// Each case carries the Carbon key code and modifier mask so registering the
-    /// hotkey is driven entirely by the stored preference. Previously the
-    /// preference existed in the UI but `HotkeyMonitor` hard-coded ⌘⇧Space, so
-    /// changing the picker did nothing.
+    /// `fn` is the Fn / 🌐 key on its own and always dictates from the
+    /// microphone; it is watched by `FnKeyMonitor`. The other cases carry the
+    /// Carbon key code and modifier mask `HotkeyMonitor` registers, and record
+    /// from the selected audio source — they exist for keyboards without Fn.
     enum HotkeyPreset: String, Codable, Sendable, CaseIterable, Identifiable {
+        case fn
         case commandShiftSpace
         case controlOptionSpace
         case commandOptionSpace
         case controlShiftSpace
+        case optionSpace
 
         var id: String { rawValue }
+
+        /// `true` for the Fn key, which Carbon cannot register.
+        var isFunctionKey: Bool { self == .fn }
 
         /// Virtual key code for the space bar (`kVK_Space`).
         var keyCode: UInt32 { UInt32(kVK_Space) }
 
         var carbonModifiers: UInt32 {
             switch self {
+            case .fn:                 return 0
             case .commandShiftSpace:  return UInt32(cmdKey | shiftKey)
             case .controlOptionSpace: return UInt32(controlKey | optionKey)
             case .commandOptionSpace: return UInt32(cmdKey | optionKey)
             case .controlShiftSpace:  return UInt32(controlKey | shiftKey)
+            case .optionSpace:        return UInt32(optionKey)
             }
         }
 
         var displayName: String {
             switch self {
+            case .fn:                 return "fn"
             case .commandShiftSpace:  return "⌘⇧Space"
             case .controlOptionSpace: return "⌃⌥Space"
             case .commandOptionSpace: return "⌘⌥Space"
             case .controlShiftSpace:  return "⌃⇧Space"
+            case .optionSpace:        return "⌥Space"
+            }
+        }
+
+        /// Individual key caps for the shortcut badge, e.g. `["⌘", "⇧", "Space"]`.
+        var keyCaps: [String] {
+            switch self {
+            case .fn:                 return ["fn"]
+            case .commandShiftSpace:  return ["⌘", "⇧", "Space"]
+            case .controlOptionSpace: return ["⌃", "⌥", "Space"]
+            case .commandOptionSpace: return ["⌘", "⌥", "Space"]
+            case .controlShiftSpace:  return ["⌃", "⇧", "Space"]
+            case .optionSpace:        return ["⌥", "Space"]
             }
         }
 
@@ -111,6 +122,8 @@ extension AppSettings {
             case "⌃⌥Space", "ctrlOptSpace":   return .controlOptionSpace
             case "⌘⌥Space":                    return .commandOptionSpace
             case "⌃⇧Space":                    return .controlShiftSpace
+            case "⌥Space":                     return .optionSpace
+            case "Fn", "🌐", "globe":           return .fn
             default:                           return nil
             }
         }

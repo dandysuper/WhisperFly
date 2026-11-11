@@ -7,76 +7,43 @@
 "status.error" = "错误：%@";
 
 /* Floating status view */
-"floating.listening" = "正在聆听…";
 "floating.transcribing" = "转录中…";
-"floating.rewriting" = "改写中…";
-"floating.done" = "完成 ✓";
+"floating.done" = "完成";
 
 /* Menu bar */
 "menu.start_recording" = "开始录音";
 "menu.stop_recording" = "停止录音";
 "menu.settings" = "设置…";
 "menu.quit" = "退出";
-"menu.api_keys_missing" = "未配置 API 密钥";
-"menu.backend" = "后端：";
-"menu.rewrite" = "改写：";
-"menu.last_latency" = "最近延迟：";
-"menu.transcription" = "转录";
 "menu.last_result" = "最近结果";
-"menu.raw" = "原文：";
-"menu.rewritten" = "改写后：";
-"menu.dismiss" = "关闭";
 
 /* Settings – tabs */
 "settings.tab.general" = "通用";
-"settings.tab.api_keys" = "API 密钥";
 "settings.tab.advanced" = "高级";
 
 /* Settings – general */
-"settings.transcription_backend" = "转录后端";
 "settings.source_language" = "源语言";
-"settings.enable_rewriting" = "启用 Gemini 改写";
 "settings.rewrite_mode" = "改写模式";
 "settings.hotkey" = "快捷键";
 "settings.read_aloud" = "粘贴后朗读";
 
 /* Settings – languages */
-"lang.ru" = "俄语";
-"lang.en" = "英语";
-"lang.de" = "德语";
-"lang.fr" = "法语";
-"lang.es" = "西班牙语";
-"lang.ja" = "日语";
-"lang.zh" = "中文";
-"lang.ko" = "韩语";
-"lang.it" = "意大利语";
-"lang.hi" = "印地语";
-"lang.kk" = "哈萨克语";
 
 /* Settings – API keys */
-"settings.groq_section" = "Groq (Whisper ASR)";
-"settings.openrouter_section" = "OpenRouter (Gemini Flash)";
 "settings.api_key" = "API 密钥";
-"settings.groq_hint" = "在 console.groq.com 获取免费密钥";
-"settings.openrouter_hint" = "在 openrouter.ai 获取免费密钥";
-"settings.key_configured" = "密钥已配置";
 
 /* Settings – advanced */
-"settings.max_recording" = "最大录音时长：%d 秒";
-"settings.paste_delay" = "粘贴延迟：%d 毫秒";
 
 /* Rewrite modes */
 "rewrite.cleanup" = "清理";
 "rewrite.punctuate" = "标点";
-"rewrite.translate" = "翻译为英语";
 
 /* Audio source */
 "settings.audio_source" = "音频来源";
 "audio_source.microphone" = "麦克风";
 "audio_source.system_audio" = "系统音频";
 "menu.start_capture" = "捕获系统音频";
-"floating.capturing" = "捕获中…";
-"floating.copied" = "已复制 ✓";
+"floating.copied" = "已复制";
 
 /* File transcription */
 "menu.transcribe_file" = "转录文件…";
@@ -98,18 +65,13 @@
 "result.title.system" = "系统音频转录";
 "result.title.file" = "文件转录";
 "result.copy" = "复制";
-"result.copied" = "已复制 ✓";
-"result.chars" = "字符";
+"result.copied" = "已复制";
 
 /* Screen Recording permission */
-"menu.screen_recording_required" = "需要屏幕录制权限";
-"menu.screen_recording_hint" = "用于捕获系统音频";
 
 /* Permissions, code-signature diagnostics and the commit-based updater —
    added with the permission-persistence / updater work. Keys absent from a
    table fall back to the English default baked into the L() call sites. */
-"backend.gemini" = "Gemini 2.5 Flash (OpenRouter)";
-"backend.groq" = "Groq Whisper（免费）";
 "common.no" = "否";
 "common.yes" = "是";
 "error.permission_required" = "此音频来源需要“%@”权限。请在系统设置中启用后再试。";
@@ -142,9 +104,6 @@
 "screen.error.missing_entitlements" = "此构建缺少 macOS 要求的屏幕录制 entitlement。";
 "screen.error.no_source" = "系统未报告任何可捕获的显示器。";
 "screen.error.user_declined" = "屏幕录制访问被拒绝。";
-"settings.openrouter_model" = "模型 ID";
-"settings.openrouter_model_hint" = "默认：google/gemini-2.5-flash";
-"settings.openrouter_model_section" = "OpenRouter 模型";
 "settings.permissions.footer" = "WhisperFly 会在首次需要时向 macOS 请求上述各项权限。";
 "settings.permissions.header" = "必需的权限";
 "settings.permissions.recheck" = "重新检查";

@@ -41,8 +41,10 @@ struct AppSettingsDecodingTests {
         """)
         let settings = try JSONDecoder().decode(AppSettings.self, from: data)
         #expect(settings.audioSource == .microphone)
-        #expect(settings.transcriptionBackend == .groqWhisper)
-        #expect(settings.hotkey == .commandShiftSpace)
+        #expect(settings.transcriptionProvider == .groq)
+        // 2.x settings move to the Fn key once; the stored label itself still parses.
+        #expect(settings.hotkey == .fn)
+        #expect(AppSettings.HotkeyPreset.fromPersisted("⌘⇧Space") == .commandShiftSpace)
         #expect(settings.rewriteMode == .translate)
     }
 
@@ -56,8 +58,8 @@ struct AppSettingsDecodingTests {
         """)
         let settings = try JSONDecoder().decode(AppSettings.self, from: data)
         #expect(settings.audioSource == .microphone)
-        #expect(settings.transcriptionBackend == .groqWhisper)
-        #expect(settings.hotkey == .commandShiftSpace)
+        #expect(settings.transcriptionProvider == .groq)
+        #expect(settings.hotkey == .fn)
     }
 
     @Test func outOfBoundsNumbersAreClamped() throws {
@@ -69,7 +71,7 @@ struct AppSettingsDecodingTests {
         }
         """)
         let settings = try JSONDecoder().decode(AppSettings.self, from: data)
-        #expect(settings.maxRecordingSeconds == 300)
+        #expect(settings.maxRecordingSeconds == 600)
         #expect(settings.pasteDelayMs == 50)
         #expect(settings.updateCheckIntervalHours == 1)
     }
@@ -83,7 +85,7 @@ struct AppSettingsDecodingTests {
         }
         """)
         let settings = try JSONDecoder().decode(AppSettings.self, from: data)
-        #expect(settings.geminiRewriteEnabled == true)
+        #expect(settings.rewriteEnabled == true)
         #expect(settings.maxRecordingSeconds == 120)
         #expect(settings.groqApiKey == "")
     }

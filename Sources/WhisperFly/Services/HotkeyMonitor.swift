@@ -4,7 +4,8 @@ import os.log
 
 private let log = Logger(subsystem: "com.whisperfly", category: "Hotkey")
 
-/// Registers the global push-to-toggle shortcut with Carbon's hotkey API.
+/// Registers the global dictation shortcut, and Escape while a dictation is in
+/// flight, with Carbon's hotkey API.
 ///
 /// Carbon hot keys are used rather than `NSEvent` global monitors because they
 /// fire even when another app is frontmost and, unlike an event tap, they need no
@@ -12,16 +13,17 @@ private let log = Logger(subsystem: "com.whisperfly", category: "Hotkey")
 /// for text insertion, and tying the hotkey to it would mean the shortcut stops
 /// working the moment the user revokes AX.
 ///
-/// The previous implementation hard-coded ⌘⇧Space: `AppSettings.hotkey` was
-/// presented in the settings UI and then never read, so choosing a different
-/// shortcut appeared to work and changed nothing. Registration is now driven by
-/// the preset it is handed.
+/// Escape is registered only while recording or transcribing, so it cancels the
+/// dictation from any app and is handed back to the system the moment the
+/// pipeline is idle again.
 final class HotkeyMonitor: HotkeyMonitoring, @unchecked Sendable {
 
     var onPress: (@Sendable () -> Void)?
     var onRelease: (@Sendable () -> Void)?
+    var onCancel: (@Sendable () -> Void)?
 
     private var hotkeyRef: EventHotKeyRef?
+    private var cancelRef: EventHotKeyRef?
     private var handlerRef: EventHandlerRef?
 
     /// The instance the C event callback talks to; C function pointers cannot
@@ -31,18 +33,20 @@ final class HotkeyMonitor: HotkeyMonitoring, @unchecked Sendable {
     /// Distinguishes registrations so a hotkey the system still holds from a
     /// previous registration cannot be mistaken for the new one.
     private static let signature: OSType = 0x5746_4C57 // "WFLW"
+    private static let cancelID: UInt32 = 0xE5C
     private var registrationCount: UInt32 = 0
+    private var mainHotkeyID: UInt32 = 0
 
     // MARK: - Registration
 
     func register(preset: AppSettings.HotkeyPreset) throws {
-        unregister()
+        unregisterMainHotkey()
         Self.current = self
+        try installHandlerIfNeeded()
 
         registrationCount += 1
-        let hotkeyID = EventHotKeyID(signature: Self.signature, id: registrationCount)
-
-        try installHandler()
+        mainHotkeyID = registrationCount
+        let hotkeyID = EventHotKeyID(signature: Self.signature, id: mainHotkeyID)
 
         var reference: EventHotKeyRef?
         let status = RegisterEventHotKey(
@@ -55,8 +59,6 @@ final class HotkeyMonitor: HotkeyMonitoring, @unchecked Sendable {
         )
 
         guard status == noErr else {
-            removeHandler()
-            Self.current = nil
             throw HotkeyError.registrationFailed(chord: preset.displayName, status: status)
         }
 
@@ -64,11 +66,42 @@ final class HotkeyMonitor: HotkeyMonitoring, @unchecked Sendable {
         log.info("Registered hotkey \(preset.displayName, privacy: .public)")
     }
 
-    func unregister() {
-        if let reference = hotkeyRef {
-            UnregisterEventHotKey(reference)
-            hotkeyRef = nil
+    func registerCancelKey() {
+        guard cancelRef == nil else { return }
+        do { try installHandlerIfNeeded() } catch { return }
+        var reference: EventHotKeyRef?
+        let status = RegisterEventHotKey(
+            UInt32(kVK_Escape),
+            0,
+            EventHotKeyID(signature: Self.signature, id: Self.cancelID),
+            GetApplicationEventTarget(),
+            0,
+            &reference
+        )
+        if status == noErr {
+            cancelRef = reference
+        } else {
+            log.info("Escape is owned by another app (status \(status)); cancel stays mouse-only")
         }
+    }
+
+    func unregisterCancelKey() {
+        if let reference = cancelRef {
+            UnregisterEventHotKey(reference)
+            cancelRef = nil
+        }
+    }
+
+    /// Releases the dictation chord but keeps the handler for Escape; used when
+    /// the shortcut is Fn, which `FnKeyMonitor` watches instead.
+    func unregisterShortcut() {
+        unregisterMainHotkey()
+        mainHotkeyID = 0
+    }
+
+    func unregister() {
+        unregisterMainHotkey()
+        unregisterCancelKey()
         removeHandler()
         if Self.current === self {
             Self.current = nil
@@ -76,25 +109,26 @@ final class HotkeyMonitor: HotkeyMonitoring, @unchecked Sendable {
     }
 
     deinit {
-        if let reference = hotkeyRef {
-            UnregisterEventHotKey(reference)
-        }
+        if let reference = hotkeyRef { UnregisterEventHotKey(reference) }
+        if let reference = cancelRef { UnregisterEventHotKey(reference) }
         // `removeHandler` is not called from deinit: AppKit may already be
         // tearing down the application event target at this point.
     }
 
     // MARK: - Private
 
-    private func installHandler() throws {
+    private func unregisterMainHotkey() {
+        if let reference = hotkeyRef {
+            UnregisterEventHotKey(reference)
+            hotkeyRef = nil
+        }
+    }
+
+    private func installHandlerIfNeeded() throws {
+        guard handlerRef == nil else { return }
         var eventTypes = [
-            EventTypeSpec(
-                eventClass: OSType(kEventClassKeyboard),
-                eventKind: UInt32(kEventHotKeyPressed)
-            ),
-            EventTypeSpec(
-                eventClass: OSType(kEventClassKeyboard),
-                eventKind: UInt32(kEventHotKeyReleased)
-            )
+            EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
+            EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased)),
         ]
 
         var handler: EventHandlerRef?
@@ -102,13 +136,31 @@ final class HotkeyMonitor: HotkeyMonitoring, @unchecked Sendable {
             GetApplicationEventTarget(),
             { _, event, _ -> OSStatus in
                 guard let event else { return OSStatus(eventNotHandledErr) }
-                switch GetEventKind(event) {
-                case UInt32(kEventHotKeyPressed):
-                    HotkeyMonitor.current?.onPress?()
-                case UInt32(kEventHotKeyReleased):
-                    HotkeyMonitor.current?.onRelease?()
-                default:
+                var hotkeyID = EventHotKeyID()
+                let lookup = GetEventParameter(
+                    event,
+                    EventParamName(kEventParamDirectObject),
+                    EventParamType(typeEventHotKeyID),
+                    nil,
+                    MemoryLayout<EventHotKeyID>.size,
+                    nil,
+                    &hotkeyID
+                )
+                guard lookup == noErr, hotkeyID.signature == HotkeyMonitor.signature,
+                      let monitor = HotkeyMonitor.current else {
                     return OSStatus(eventNotHandledErr)
+                }
+
+                let kind = GetEventKind(event)
+                if hotkeyID.id == HotkeyMonitor.cancelID {
+                    if kind == UInt32(kEventHotKeyPressed) { monitor.onCancel?() }
+                    return noErr
+                }
+                guard hotkeyID.id == monitor.mainHotkeyID else { return OSStatus(eventNotHandledErr) }
+                switch kind {
+                case UInt32(kEventHotKeyPressed):  monitor.onPress?()
+                case UInt32(kEventHotKeyReleased): monitor.onRelease?()
+                default: return OSStatus(eventNotHandledErr)
                 }
                 return noErr
             },

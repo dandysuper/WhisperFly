@@ -73,6 +73,15 @@ final class SettingsStore: @unchecked Sendable {
         if let key = environment["OPENROUTER_API_KEY"], !key.isEmpty {
             settings.openRouterApiKey = key
         }
+        if let key = environment["GEMINI_API_KEY"] ?? environment["GOOGLE_API_KEY"], !key.isEmpty {
+            settings.geminiApiKey = key
+        }
+        // A developer who only has a Gemini key should get a working pipeline
+        // on first run instead of a Groq default with no key behind it.
+        if settings.groqApiKey.isEmpty, !settings.geminiApiKey.isEmpty {
+            settings.transcriptionProvider = .gemini
+            settings.rewriteProvider = .gemini
+        }
         return settings
     }
 

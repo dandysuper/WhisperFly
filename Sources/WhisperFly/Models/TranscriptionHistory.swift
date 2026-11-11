@@ -38,18 +38,35 @@ struct TranscriptionEntry: Codable, Identifiable, Sendable {
     /// Original filename for file transcriptions.
     let fileName: String?
     let latency: TimeInterval
+    /// The transcript before the rewrite pass, when one ran and changed it.
+    let rawText: String?
+    /// Engine that produced the transcript, e.g. `Groq · whisper-large-v3-turbo`.
+    let provider: String?
+    /// Length of the recording in seconds.
+    let duration: TimeInterval?
 
-    init(text: String, source: Source, fileName: String? = nil, latency: TimeInterval = 0) {
+    init(
+        text: String,
+        source: Source,
+        fileName: String? = nil,
+        latency: TimeInterval = 0,
+        rawText: String? = nil,
+        provider: String? = nil,
+        duration: TimeInterval? = nil
+    ) {
         self.id = UUID()
         self.date = Date()
         self.text = text
         self.source = source
         self.fileName = fileName
         self.latency = latency
+        self.rawText = (rawText == text) ? nil : rawText
+        self.provider = provider
+        self.duration = duration
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, date, text, source, fileName, latency
+        case id, date, text, source, fileName, latency, rawText, provider, duration
     }
 
     init(from decoder: any Decoder) throws {
@@ -59,6 +76,9 @@ struct TranscriptionEntry: Codable, Identifiable, Sendable {
         text = Self.decode(container, .text, fallback: "")
         fileName = (try? container.decodeIfPresent(String.self, forKey: .fileName)) ?? nil
         latency = Self.decode(container, .latency, fallback: 0)
+        rawText = (try? container.decodeIfPresent(String.self, forKey: .rawText)) ?? nil
+        provider = (try? container.decodeIfPresent(String.self, forKey: .provider)) ?? nil
+        duration = (try? container.decodeIfPresent(TimeInterval.self, forKey: .duration)) ?? nil
 
         let rawSource = (try? container.decodeIfPresent(String.self, forKey: .source)) ?? nil
         source = rawSource.flatMap(Source.fromPersisted) ?? .microphone
@@ -79,6 +99,10 @@ struct TranscriptionEntry: Codable, Identifiable, Sendable {
         case .systemAudio: return "speaker.wave.2.fill"
         case .file:        return "doc.fill"
         }
+    }
+
+    var wordCount: Int {
+        text.split { $0.isWhitespace || $0.isNewline }.count
     }
 
     var sourceLabel: String {
@@ -118,6 +142,11 @@ final class TranscriptionHistory: ObservableObject {
 
     func remove(at offsets: IndexSet) {
         entries.remove(atOffsets: offsets)
+        save()
+    }
+
+    func remove(id: TranscriptionEntry.ID) {
+        entries.removeAll { $0.id == id }
         save()
     }
 

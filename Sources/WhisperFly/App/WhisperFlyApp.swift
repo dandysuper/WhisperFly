@@ -4,18 +4,14 @@ import SwiftUI
 struct WhisperFlyApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var controller = AppController()
-    
+
     var body: some Scene {
         MenuBarExtra {
-            MenuBarContentView(controller: controller)
+            MenuBarContentView(controller: controller, permissions: controller.permissions, updates: controller.updates)
         } label: {
             Image(systemName: controller.status.iconName)
         }
         .menuBarExtraStyle(.window)
-        
-        Settings {
-            SettingsView(controller: controller)
-        }
     }
 }
 
