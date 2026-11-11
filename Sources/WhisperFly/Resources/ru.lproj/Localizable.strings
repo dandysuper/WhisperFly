@@ -361,3 +361,16 @@
 "settings.fn.hint" = "Одна клавиша fn всегда запускает диктовку с микрофона. Чтобы видеть клавишу, WhisperFly нужно разрешение «Универсальный доступ». Сочетания вроде fn+Delete продолжают работать. Только встроенные и клавиатуры Apple — для других выберите сочетание клавиш.";
 "onboarding.try.body_fn_hold" = "Щёлкните в поле, удерживайте fn, говорите и отпустите. Короткое нажатие fn запускает и останавливает запись. Esc отменяет.";
 "onboarding.try.body_fn_toggle" = "Щёлкните в поле, нажмите fn, говорите и нажмите fn ещё раз. Esc отменяет.";
+
+/* WhisperFly 3.1 — Intel and macOS 13+ compatibility */
+"system.hardware.rosetta" = "Apple silicon (Intel-версия через Rosetta)";
+"system.hardware.apple_silicon" = "Apple silicon";
+"system.hardware.intel" = "Intel";
+"system.build.universal" = "универсальное приложение";
+"settings.appearance" = "Оформление";
+"settings.classic_materials" = "Классический вид";
+"settings.classic_materials.hint" = "Полупрозрачные материалы вместо Liquid Glass. Легче для старых Mac на Intel. Плавающие окна переключатся при следующем открытии.";
+"settings.classic_only" = "Для Liquid Glass нужна macOS 26. На этом Mac WhisperFly использует классический полупрозрачный вид.";
+"updates.build.mac" = "Этот Mac";
+"update.install.requires_newer_os" = "Для этого обновления нужна macOS %@ или новее, а на этом Mac установлена %@. Текущая версия сохранена.";
+"update.install.unsupported_arch" = "В этом обновлении нет версии для процессора этого Mac. Текущая версия сохранена.";

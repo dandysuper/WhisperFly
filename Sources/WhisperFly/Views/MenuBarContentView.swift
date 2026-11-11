@@ -97,7 +97,7 @@ struct MenuBarContentView: View {
                 HStack(spacing: 10) {
                     Image(systemName: recordIcon)
                         .font(.system(size: 17, weight: .semibold))
-                        .contentTransition(.symbolEffect(.replace))
+                        .symbolReplaceTransition()
                     Text(recordTitle)
                         .font(.system(size: 14, weight: .semibold))
                     Spacer(minLength: 4)

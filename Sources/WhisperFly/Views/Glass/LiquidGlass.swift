@@ -4,58 +4,115 @@ import AppKit
 // Liquid Glass with a graceful fallback.
 //
 // macOS 26 introduced Liquid Glass (`glassEffect`, `GlassEffectContainer`, the
-// `.glass` button styles and `NSGlassEffectView`). WhisperFly still supports
-// macOS 14, so every use goes through these helpers: on 26+ they produce real
-// glass, on earlier systems a translucent material that keeps the same shapes
-// and layout.
+// `.glass` button styles and `NSGlassEffectView`). WhisperFly supports macOS 13,
+// so every use goes through these helpers: on 26+ they produce real glass, on
+// earlier systems — or when the user picks the classic look — translucent
+// materials with the same shapes and layout.
+//
+// This file is the only one that names a glass API. The `compiler(>=6.2)` guard
+// keeps it building with Xcode 16 and the macOS 15 SDK, which do not have them,
+// so the app can still be built from source on an Intel Mac running Sonoma or
+// Sequoia. `WHISPERFLY_NO_LIQUID_GLASS` forces that path for testing.
+
+#if compiler(>=6.2) && !WHISPERFLY_NO_LIQUID_GLASS
+private let sdkHasLiquidGlass = true
+#else
+private let sdkHasLiquidGlass = false
+#endif
+
+/// Decides between Liquid Glass and the classic materials.
+@MainActor
+enum LiquidGlassSupport {
+    /// Set from `AppSettings.classicMaterials`; applies to views rendered and
+    /// windows opened from then on.
+    static var prefersClassic = false
+
+    static var isActive: Bool {
+        guard sdkHasLiquidGlass, !prefersClassic else { return false }
+        if #available(macOS 26.0, *) { return true }
+        return false
+    }
+
+    /// `true` when this Mac could show Liquid Glass at all, so the setting is
+    /// worth offering.
+    static var isAvailable: Bool {
+        guard sdkHasLiquidGlass else { return false }
+        if #available(macOS 26.0, *) { return true }
+        return false
+    }
+}
 
 extension View {
 
     /// Puts a Liquid Glass surface behind the view in `shape`.
     @ViewBuilder
     func liquidGlass<S: Shape>(_ shape: S, tint: Color? = nil, interactive: Bool = false) -> some View {
-        if #available(macOS 26.0, *) {
+        #if compiler(>=6.2) && !WHISPERFLY_NO_LIQUID_GLASS
+        if #available(macOS 26.0, *), LiquidGlassSupport.isActive {
             self.glassEffect(Self.glass(tint: tint, interactive: interactive), in: shape)
         } else {
-            self.background {
-                ZStack {
-                    shape.fill(.regularMaterial)
-                    if let tint { shape.fill(tint.opacity(0.16)) }
-                    shape.stroke(Color.white.opacity(0.22), lineWidth: 0.6)
-                }
-                .shadow(color: .black.opacity(0.18), radius: 10, y: 4)
+            self.classicGlass(shape, tint: tint)
+        }
+        #else
+        self.classicGlass(shape, tint: tint)
+        #endif
+    }
+
+    /// The pre-macOS 26 stand-in: a material with a hairline and a soft shadow.
+    /// Materials turn opaque by themselves when Reduce Transparency is on.
+    private func classicGlass<S: Shape>(_ shape: S, tint: Color?) -> some View {
+        self.background {
+            ZStack {
+                shape.fill(.regularMaterial)
+                if let tint { shape.fill(tint.opacity(0.16)) }
+                shape.stroke(Color.primary.opacity(0.10), lineWidth: 0.6)
             }
+            .shadow(color: .black.opacity(0.16), radius: 8, y: 3)
         }
     }
 
     /// Glass button style on macOS 26, bordered style before.
     @ViewBuilder
     func glassButton(prominent: Bool = false) -> some View {
-        if #available(macOS 26.0, *) {
+        #if compiler(>=6.2) && !WHISPERFLY_NO_LIQUID_GLASS
+        if #available(macOS 26.0, *), LiquidGlassSupport.isActive {
             if prominent {
                 self.buttonStyle(.glassProminent)
             } else {
                 self.buttonStyle(.glass)
             }
         } else {
-            if prominent {
-                self.buttonStyle(.borderedProminent)
-            } else {
-                self.buttonStyle(.bordered)
-            }
+            self.classicButton(prominent: prominent)
+        }
+        #else
+        self.classicButton(prominent: prominent)
+        #endif
+    }
+
+    @ViewBuilder
+    private func classicButton(prominent: Bool) -> some View {
+        if prominent {
+            self.buttonStyle(.borderedProminent)
+        } else {
+            self.buttonStyle(.bordered)
         }
     }
 
     /// Ties the view to a morphing glass identity inside a `GlassGroup`.
     @ViewBuilder
     func glassID<ID: Hashable & Sendable>(_ id: ID, in namespace: Namespace.ID) -> some View {
-        if #available(macOS 26.0, *) {
+        #if compiler(>=6.2) && !WHISPERFLY_NO_LIQUID_GLASS
+        if #available(macOS 26.0, *), LiquidGlassSupport.isActive {
             self.glassEffectID(id, in: namespace)
         } else {
             self
         }
+        #else
+        self
+        #endif
     }
 
+    #if compiler(>=6.2) && !WHISPERFLY_NO_LIQUID_GLASS
     @available(macOS 26.0, *)
     private static func glass(tint: Color?, interactive: Bool) -> Glass {
         var glass = Glass.regular
@@ -63,6 +120,7 @@ extension View {
         if interactive { glass = glass.interactive() }
         return glass
     }
+    #endif
 }
 
 /// Lets nearby glass shapes blend and morph into each other on macOS 26.
@@ -71,11 +129,15 @@ struct GlassGroup<Content: View>: View {
     @ViewBuilder let content: Content
 
     var body: some View {
-        if #available(macOS 26.0, *) {
+        #if compiler(>=6.2) && !WHISPERFLY_NO_LIQUID_GLASS
+        if #available(macOS 26.0, *), LiquidGlassSupport.isActive {
             GlassEffectContainer(spacing: spacing) { content }
         } else {
             content
         }
+        #else
+        content
+        #endif
     }
 }
 
@@ -155,15 +217,19 @@ struct KeyCaps: View {
 enum GlassWindowContent {
 
     static func make(hosting: NSView, cornerRadius: CGFloat) -> NSView {
-        if #available(macOS 26.0, *) {
+        #if compiler(>=6.2) && !WHISPERFLY_NO_LIQUID_GLASS
+        if #available(macOS 26.0, *), LiquidGlassSupport.isActive {
             let glass = NSGlassEffectView()
             glass.cornerRadius = cornerRadius
             glass.contentView = hosting
             return glass
         }
+        #endif
 
+        // `.popover` follows light and dark mode; `.hudWindow` is dark-styled and
+        // would put dark text on a dark panel in light mode.
         let effect = NSVisualEffectView()
-        effect.material = .hudWindow
+        effect.material = .popover
         effect.blendingMode = .behindWindow
         effect.state = .active
         effect.maskImage = roundedMask(radius: cornerRadius)

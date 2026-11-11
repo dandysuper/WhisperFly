@@ -97,7 +97,7 @@ struct TranscriptionResultView: View {
             } label: {
                 Label(copied.value ? L("result.copied", "Copied") : L("result.copy", "Copy"),
                       systemImage: copied.value ? "checkmark" : "doc.on.doc")
-                    .contentTransition(.symbolEffect(.replace))
+                    .symbolReplaceTransition()
             }
             .glassButton(prominent: true)
             .tint(copied.value ? .green : .accentColor)
@@ -151,7 +151,7 @@ struct TranscriptionResultView: View {
         panel.allowedContentTypes = [.plainText]
         let base = (entry.fileName as NSString?)?.deletingPathExtension ?? "Transcription"
         panel.nameFieldStringValue = "\(base).txt"
-        NSApp.activate()
+        NSApp.activateCompat()
         guard panel.runModal() == .OK, let url = panel.url else { return }
         try? displayedText.write(to: url, atomically: true, encoding: .utf8)
     }

@@ -98,7 +98,7 @@ class HostedWindowController<Content: View> {
             window.setFrameAutosaveName(autosaveName)
             self.window = window
         }
-        NSApp.activate()
+        NSApp.activateCompat()
         window?.makeKeyAndOrderFront(nil)
     }
 

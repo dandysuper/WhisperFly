@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Usage: ./scripts/release.sh <version>
-# Example: ./scripts/release.sh 1.1.0
+# Usage: ./scripts/release.sh [version]
+# Example: ./scripts/release.sh 3.1.0   (defaults to the VERSION file)
 #
 # Prerequisites:
 #   gh auth login
 
 set -euo pipefail
 
-VERSION="${1:-}"
+VERSION="${1:-$(tr -d '[:space:]' < "$(dirname "$0")/../VERSION" 2>/dev/null || true)}"
 if [[ -z "$VERSION" ]]; then
   echo "Usage: $0 <version>  (e.g. 1.1.0)" >&2
   exit 1
@@ -85,6 +85,15 @@ if [[ -d "$TAP_ROOT" ]]; then
   CASK_FILE="$TAP_ROOT/Casks/whisperfly.rb"
   sed -i '' "s/version \".*\"/version \"${VERSION}\"/" "$CASK_FILE"
   sed -i '' "s/sha256 \".*\"/sha256 \"${SHA256}\"/" "$CASK_FILE"
+  # Keep Homebrew's install gate in step with the app's own minimum macOS.
+  MIN_MACOS="$(plutil -extract LSMinimumSystemVersion raw "$REPO_ROOT/scripts/Info.plist")"
+  case "$MIN_MACOS" in
+    13*) BREW_MACOS=":ventura" ;;  14*) BREW_MACOS=":sonoma" ;;  15*) BREW_MACOS=":sequoia" ;;
+    *)   BREW_MACOS="" ;;
+  esac
+  if [[ -n "$BREW_MACOS" ]] && grep -q 'depends_on macos:' "$CASK_FILE"; then
+    sed -i '' "s/depends_on macos: .*/depends_on macos: \">= ${BREW_MACOS}\"/" "$CASK_FILE"
+  fi
   git -C "$TAP_ROOT" add Casks/whisperfly.rb
   git -C "$TAP_ROOT" commit -m "chore: bump whisperfly to ${TAG}"
   git -C "$TAP_ROOT" push origin main

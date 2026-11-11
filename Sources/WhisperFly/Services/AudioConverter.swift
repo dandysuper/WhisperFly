@@ -139,11 +139,21 @@ enum AudioConverter {
                     outStatus.pointee = .endOfStream
                     return nil
                 }
+                // `AVAudioFile.read` throws eofErr (-39) instead of returning zero
+                // frames once the file is exhausted, so never read past the end.
+                let remaining = input.length - input.framePosition
+                guard remaining > 0 else {
+                    reachedEnd = true
+                    outStatus.pointee = .endOfStream
+                    return nil
+                }
                 do {
                     readBuffer.frameLength = 0
-                    try input.read(into: readBuffer, frameCount: chunkFrames)
+                    try input.read(into: readBuffer, frameCount: AVAudioFrameCount(min(Int64(chunkFrames), remaining)))
                 } catch {
-                    readError = error
+                    // `length` is only an estimate for some compressed files, so
+                    // an early end of file is still just the end of the audio.
+                    if !Self.isEndOfFile(error) { readError = error }
                     reachedEnd = true
                     outStatus.pointee = .endOfStream
                     return nil
@@ -207,6 +217,12 @@ enum AudioConverter {
 
     private static func fileSize(_ url: URL) -> Int {
         (try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0
+    }
+
+    /// `eofErr` and `kAudioFileEndOfFileError` are both -39.
+    private static func isEndOfFile(_ error: Error) -> Bool {
+        let nsError = error as NSError
+        return nsError.domain == NSOSStatusErrorDomain && nsError.code == Int(eofErr)
     }
 
     private static func conversionError(_ code: Int, _ message: String) -> NSError {

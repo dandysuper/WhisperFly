@@ -18,6 +18,7 @@ struct UpdatesView: View {
             Section(L("updates.build.header", "This Build")) {
                 labelled(L("updates.build.version", "Version"), BuildInfo.displayVersion)
                 labelled(L("updates.build.commit", "Commit"), updates.localRevisionDescription)
+                labelled(L("updates.build.mac", "This Mac"), "\(SystemInfo.hardwareDescription) · \(SystemInfo.osDescription)")
                 if let commitDate = BuildInfo.commitDate {
                     labelled(L("updates.build.commit_date", "Committed"),
                              Self.dateFormatter.string(from: commitDate))

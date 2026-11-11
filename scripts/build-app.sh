@@ -9,8 +9,8 @@
 # Usage:
 #   ./scripts/build-app.sh                       # release build of the host arch
 #   ./scripts/build-app.sh --config debug        # debug build
-#   ./scripts/build-app.sh --universal           # universal (arm64 + x86_64) binary
-#   ./scripts/build-app.sh --version 2.1.0       # override the marketing version
+#   ./scripts/build-app.sh --universal           # universal (arm64 + x86_64) binary, for Intel Macs too
+#   ./scripts/build-app.sh --version 3.1.0       # override the marketing version (default: VERSION file)
 #   ./scripts/build-app.sh --no-sign             # skip codesigning entirely
 #   WHISPERFLY_SCRATCH_PATH=/tmp/wf ./scripts/build-app.sh   # build outside the checkout
 #
@@ -70,8 +70,29 @@ if [[ ! -f "$BUILT_BINARY" ]]; then
     exit 1
 fi
 
+# --- Check the binary ----------------------------------------------------------
+
+# Every slice must target the macOS in Info.plist, or the app would install on a
+# Mac it cannot open on. A universal build must really contain both slices.
+MIN_MACOS="$(plutil -extract LSMinimumSystemVersion raw "$INFO_PLIST_TEMPLATE")"
+ARCHS="$(lipo -archs "$BUILT_BINARY")"
+for arch in $ARCHS; do
+    minos="$(vtool -arch "$arch" -show-build "$BUILT_BINARY" 2>/dev/null | awk '/minos/ {print $2; exit}')"
+    if [[ "$minos" != "$MIN_MACOS" ]]; then
+        echo "ERROR: $arch slice targets macOS ${minos:-?}, but Info.plist says $MIN_MACOS." >&2
+        exit 1
+    fi
+done
+if [[ $UNIVERSAL -eq 1 && ( "$ARCHS" != *arm64* || "$ARCHS" != *x86_64* ) ]]; then
+    echo "ERROR: --universal build contains only: $ARCHS" >&2
+    exit 1
+fi
+
 # --- Stamp values ------------------------------------------------------------
 
+if [[ -z "$MARKETING_VERSION" && -f "$REPO_ROOT/VERSION" ]]; then
+    MARKETING_VERSION="$(tr -d '[:space:]' < "$REPO_ROOT/VERSION")"
+fi
 if [[ -z "$MARKETING_VERSION" ]]; then
     # Latest tag without its `v` prefix; falls back to 0.0.0 before the first tag.
     MARKETING_VERSION="$(git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//' || true)"
@@ -96,6 +117,18 @@ mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 
 cp "$BUILT_BINARY" "$APP_BUNDLE/Contents/MacOS/WhisperFly"
 chmod +x "$APP_BUNDLE/Contents/MacOS/WhisperFly"
+
+# SwiftPM records the deployment target as the SDK version too (13.0 / 13.0).
+# macOS 26 reads the SDK version to decide whether an app gets Liquid Glass
+# system controls, so record the SDK the binary was really built against, as an
+# Xcode build would. The minimum macOS stays the same, and signing comes later.
+SDK_VERSION="$(xcrun --show-sdk-version 2>/dev/null || true)"
+if [[ -n "$SDK_VERSION" ]] && command -v vtool >/dev/null; then
+    vtool -set-build-version macos "$MIN_MACOS" "$SDK_VERSION" -replace \
+        -output "$APP_BUNDLE/Contents/MacOS/WhisperFly.stamped" \
+        "$APP_BUNDLE/Contents/MacOS/WhisperFly" 2>/dev/null \
+        && mv "$APP_BUNDLE/Contents/MacOS/WhisperFly.stamped" "$APP_BUNDLE/Contents/MacOS/WhisperFly"
+fi
 cp "$INFO_PLIST_TEMPLATE" "$APP_BUNDLE/Contents/Info.plist"
 if [[ -f "$ICON_SOURCE" ]]; then
     cp "$ICON_SOURCE" "$APP_BUNDLE/Contents/Resources/AppIcon.icns"
@@ -134,6 +167,7 @@ echo ""
 echo "Build complete!"
 echo "  App:      $APP_BUNDLE"
 echo "  Version:  $MARKETING_VERSION ($BUILD_NUMBER) · ${COMMIT_SHA:0:7}"
+echo "  Runs on:  macOS $MIN_MACOS or later · $ARCHS"
 echo "  Repo:     $REPOSITORY@$BRANCH"
 echo ""
 echo "To launch:"

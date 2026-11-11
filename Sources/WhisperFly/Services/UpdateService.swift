@@ -202,15 +202,10 @@ final class UpdateService: ObservableObject {
         guard let release = latestRelease else { return nil }
         return ReleaseAsset.preferredDMG(
             from: release.assets,
-            isAppleSilicon: Self.isAppleSilicon
+            // The hardware, not this process: an Intel copy running under
+            // Rosetta should move to the native Apple silicon build.
+            isAppleSilicon: SystemInfo.isAppleSiliconHardware
         )
-    }
-
-    private static var isAppleSilicon: Bool {
-        var value: Int32 = 0
-        var size = MemoryLayout<Int32>.size
-        let status = sysctlbyname("hw.optional.arm64", &value, &size, nil, 0)
-        return status == 0 && value == 1
     }
 
     // MARK: - Helpers

@@ -102,7 +102,7 @@ struct FloatingPill: View {
             Image(systemName: "sparkles")
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(LinearGradient(colors: [.purple, .pink, .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
-                .symbolEffect(.pulse, options: .repeating)
+                .pulsingSymbol()
             label(L("floating.polishing", "Polishing…"), detail: detail)
 
         case .pasting:
@@ -113,7 +113,7 @@ struct FloatingPill: View {
             Image(systemName: delivery == .inserted ? "checkmark.circle.fill" : "doc.on.clipboard.fill")
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.green)
-                .symbolEffect(.bounce, value: phase)
+                .bounceSymbol(on: phase)
             label(doneTitle(delivery), detail: doneDetail(delivery))
 
         case .error(let message):

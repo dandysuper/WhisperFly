@@ -28,6 +28,8 @@ struct AppSettings: Codable, Sendable, Equatable {
     var soundEffectsEnabled: Bool = true
     var insertionMethod: InsertionMethod = .automatic
     var readAloudEnabled: Bool = false
+    /// Use the pre-macOS 26 materials even where Liquid Glass is available.
+    var classicMaterials: Bool = false
 
     // MARK: Transcription
 
@@ -162,6 +164,7 @@ struct AppSettings: Codable, Sendable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case audioSource, hotkey, holdToTalkEnabled, soundEffectsEnabled, insertionMethod, readAloudEnabled
+        case classicMaterials
         // `transcriptionBackend` is the 2.x name of `transcriptionProvider`.
         case transcriptionProvider, transcriptionBackend
         case groqTranscriptionModel, geminiTranscriptionModel, geminiSmartTranscription
@@ -196,6 +199,7 @@ struct AppSettings: Codable, Sendable, Equatable {
         soundEffectsEnabled = Self.decode(container, .soundEffectsEnabled, fallback: d.soundEffectsEnabled)
         insertionMethod = Self.decodeEnum(container, .insertionMethod, fallback: d.insertionMethod, InsertionMethod.init(rawValue:))
         readAloudEnabled = Self.decode(container, .readAloudEnabled, fallback: d.readAloudEnabled)
+        classicMaterials = Self.decode(container, .classicMaterials, fallback: d.classicMaterials)
 
         // Credentials first: the provider migration below looks at them.
         groqApiKey       = Self.decode(container, .groqApiKey, fallback: "")
@@ -265,6 +269,7 @@ struct AppSettings: Codable, Sendable, Equatable {
         try c.encode(soundEffectsEnabled, forKey: .soundEffectsEnabled)
         try c.encode(insertionMethod, forKey: .insertionMethod)
         try c.encode(readAloudEnabled, forKey: .readAloudEnabled)
+        try c.encode(classicMaterials, forKey: .classicMaterials)
         try c.encode(transcriptionProvider, forKey: .transcriptionProvider)
         try c.encode(groqTranscriptionModel, forKey: .groqTranscriptionModel)
         try c.encode(geminiTranscriptionModel, forKey: .geminiTranscriptionModel)

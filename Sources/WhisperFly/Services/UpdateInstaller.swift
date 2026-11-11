@@ -18,6 +18,8 @@ enum UpdateInstaller {
         case mountPointMissing
         case noAppInDiskImage
         case bundleIdentifierMismatch(found: String?, expected: String)
+        case requiresNewerSystem(minimum: String, current: String)
+        case unsupportedArchitecture
         case noWritableDestination(String)
         case copyFailed(String)
         case sourceCheckoutMissing
@@ -38,6 +40,13 @@ enum UpdateInstaller {
                 return L("update.install.identifier_mismatch",
                          "The downloaded app identifies itself as %@ instead of %@. Refusing to install it.",
                          found ?? "unknown", expected)
+            case .requiresNewerSystem(let minimum, let current):
+                return L("update.install.requires_newer_os",
+                         "This update needs macOS %@ or later, and this Mac runs %@. The installed version was kept.",
+                         minimum, current)
+            case .unsupportedArchitecture:
+                return L("update.install.unsupported_arch",
+                         "This update does not include a version for this Mac's processor. The installed version was kept.")
             case .noWritableDestination(let path):
                 return L("update.install.destination",
                          "WhisperFly cannot write to %@. Move the app somewhere you own, or reinstall it there first.", path)
@@ -72,6 +81,7 @@ enum UpdateInstaller {
 
         let sourceApp = try findApplication(in: mountPoint)
         try verify(bundleIdentifierOf: sourceApp, matches: BuildInfo.bundleIdentifier)
+        try verifyRunsOnThisMac(sourceApp)
 
         let parent = targetBundle.deletingLastPathComponent()
         guard FileManager.default.isWritableFile(atPath: parent.path) else {
@@ -207,6 +217,21 @@ enum UpdateInstaller {
         let found = plist["CFBundleIdentifier"] as? String
         guard found == expected else {
             throw InstallError.bundleIdentifierMismatch(found: found, expected: expected)
+        }
+    }
+
+    /// Refuses a build this Mac could not launch — a future release that needs
+    /// a newer macOS or drops Intel — before anything on disk is replaced.
+    private static func verifyRunsOnThisMac(_ app: URL) throws {
+        switch UpdateCompatibility.evaluate(appAt: app) {
+        case .compatible:
+            return
+        case .requiresNewerSystem(let minimum):
+            log.warning("Update needs macOS \(minimum, privacy: .public); refusing")
+            throw InstallError.requiresNewerSystem(minimum: minimum, current: SystemInfo.osDescription)
+        case .missingArchitecture(let arch):
+            log.warning("Update has no \(arch.rawValue, privacy: .public) slice; refusing")
+            throw InstallError.unsupportedArchitecture
         }
     }
 

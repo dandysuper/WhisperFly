@@ -157,6 +157,19 @@ struct AdvancedSettingsView: View {
                 }
             }
 
+            Section(L("settings.appearance", "Appearance")) {
+                if LiquidGlassSupport.isAvailable {
+                    Toggle(isOn: $controller.settings.classicMaterials) {
+                        Text(L("settings.classic_materials", "Classic look"))
+                        Text(L("settings.classic_materials.hint", "Use translucent materials instead of Liquid Glass. Lighter on older Intel Macs. Floating windows switch the next time they open."))
+                    }
+                } else {
+                    Label(L("settings.classic_only", "Liquid Glass needs macOS 26. On this Mac WhisperFly uses the classic translucent look."), systemImage: "info.circle")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section(L("settings.history", "History")) {
                 LabeledContent(L("settings.history.count", "Saved transcriptions")) {
                     Text("\(history.entries.count)")

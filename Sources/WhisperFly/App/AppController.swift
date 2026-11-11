@@ -132,9 +132,12 @@ final class AppController: ObservableObject {
 
     init() {
         let loaded = SettingsStore().load()
+        LiquidGlassSupport.prefersClassic = loaded.classicMaterials
         self.settings = loaded
         self.pasteService = PasteService(pasteDelayMs: loaded.pasteDelayMs)
         self.updates = UpdateService(configuration: Self.updateConfiguration(from: loaded))
+
+        log.info("WhisperFly \(BuildInfo.displayVersion, privacy: .public) · \(SystemInfo.hardwareDescription, privacy: .public) · \(SystemInfo.osDescription, privacy: .public) · \(SystemInfo.Architecture.current.rawValue, privacy: .public) slice · \(LiquidGlassSupport.isActive ? "Liquid Glass" : "classic materials", privacy: .public)")
 
         Self.removeStaleRecordings()
         setupAudioCallbacks()
@@ -441,7 +444,7 @@ final class AppController: ObservableObject {
     /// back to the app the text is for so the user can keep their place.
     func returnFocusToTarget() {
         guard status == .recording, let app = targetApp, !app.isTerminated else { return }
-        app.activate()
+        app.activateCompat()
     }
 
     /// Starts recording from `source` (the menu's selection when `nil`).
@@ -628,7 +631,7 @@ final class AppController: ObservableObject {
     /// Opens a picker for audio or video and transcribes the choice.
     func transcribeFile() {
         guard status.canStartRecording else { return }
-        NSApp.activate()
+        NSApp.activateCompat()
 
         let panel = NSOpenPanel()
         panel.title = L("file.pick_title", "Select Audio or Video File")
@@ -885,10 +888,10 @@ final class AppController: ObservableObject {
         }
 
         if let app = job.targetApp, !app.isTerminated {
-            app.activate()
+            app.activateCompat()
             try? await Task.sleep(for: .milliseconds(180))
             if NSWorkspace.shared.frontmostApplication?.processIdentifier != app.processIdentifier {
-                app.activate()
+                app.activateCompat()
                 try? await Task.sleep(for: .milliseconds(200))
             }
         } else {
@@ -979,6 +982,7 @@ final class AppController: ObservableObject {
 
     private func settingsDidChange(from old: AppSettings) {
         settingsStore.save(settings)
+        LiquidGlassSupport.prefersClassic = settings.classicMaterials
         if settings.pasteDelayMs != old.pasteDelayMs {
             pasteService = PasteService(pasteDelayMs: settings.pasteDelayMs)
         }

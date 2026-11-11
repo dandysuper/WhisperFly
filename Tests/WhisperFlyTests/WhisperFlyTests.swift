@@ -400,3 +400,142 @@ struct CodeSignatureInfoTests {
         #expect(info(isAdHoc: false, team: "X", requirement: "anchor apple generic").persistenceDiagnosis == nil)
     }
 }
+
+// MARK: - Update compatibility (3.1)
+
+@Suite("UpdateCompatibility")
+struct UpdateCompatibilityTests {
+
+    private let ventura = OperatingSystemVersion(majorVersion: 13, minorVersion: 6, patchVersion: 0)
+    private let universal = [NSBundleExecutableArchitectureARM64, NSBundleExecutableArchitectureX86_64]
+
+    @Test func universalBuildRunsOnIntelVentura() {
+        #expect(UpdateCompatibility.evaluate(
+            minimumSystemVersion: "13.0", architectures: universal,
+            currentSystem: ventura, currentArchitecture: .x86_64, canTranslate: false
+        ) == .compatible)
+    }
+
+    @Test func newerMinimumSystemIsRefused() {
+        #expect(UpdateCompatibility.evaluate(
+            minimumSystemVersion: "14.0", architectures: universal,
+            currentSystem: ventura, currentArchitecture: .x86_64, canTranslate: false
+        ) == .requiresNewerSystem(minimum: "14.0"))
+        // Minor and patch components count too.
+        #expect(UpdateCompatibility.evaluate(
+            minimumSystemVersion: "13.7", architectures: universal,
+            currentSystem: ventura, currentArchitecture: .arm64, canTranslate: true
+        ) == .requiresNewerSystem(minimum: "13.7"))
+    }
+
+    @Test func appleSiliconOnlyBuildIsRefusedOnIntel() {
+        #expect(UpdateCompatibility.evaluate(
+            minimumSystemVersion: "13.0", architectures: [NSBundleExecutableArchitectureARM64],
+            currentSystem: ventura, currentArchitecture: .x86_64, canTranslate: false
+        ) == .missingArchitecture(.x86_64))
+    }
+
+    @Test func intelOnlyBuildRunsOnAppleSiliconThroughRosetta() {
+        let intelOnly = [NSBundleExecutableArchitectureX86_64]
+        #expect(UpdateCompatibility.evaluate(
+            minimumSystemVersion: "13.0", architectures: intelOnly,
+            currentSystem: ventura, currentArchitecture: .arm64, canTranslate: true
+        ) == .compatible)
+        #expect(UpdateCompatibility.evaluate(
+            minimumSystemVersion: "13.0", architectures: intelOnly,
+            currentSystem: ventura, currentArchitecture: .arm64, canTranslate: false
+        ) == .missingArchitecture(.arm64))
+    }
+
+    @Test func unreadableBundleInfoIsNotTreatedAsIncompatible() {
+        #expect(UpdateCompatibility.evaluate(
+            minimumSystemVersion: nil, architectures: [],
+            currentSystem: ventura, currentArchitecture: .x86_64, canTranslate: false
+        ) == .compatible)
+    }
+
+    @Test func classicMaterialsDefaultsOffAndRoundTrips() throws {
+        #expect(try JSONDecoder().decode(AppSettings.self, from: Data("{}".utf8)).classicMaterials == false)
+        var settings = AppSettings()
+        settings.classicMaterials = true
+        let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
+        #expect(decoded.classicMaterials)
+    }
+}
+
+// MARK: - Audio conversion
+
+import AVFoundation
+
+@Suite("AudioConverter")
+struct AudioConverterTests {
+
+    /// Writes a 440 Hz tone in `format`, like the files the recorders produce.
+    private func makeTone(seconds: Double, sampleRate: Double, channels: AVAudioChannelCount,
+                          ext: String, settings: [String: Any]) throws -> URL {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("wf-test-\(UUID().uuidString).\(ext)")
+        let file = try AVAudioFile(forWriting: url, settings: settings, commonFormat: .pcmFormatFloat32, interleaved: false)
+        let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: sampleRate, channels: channels, interleaved: false)!
+        let frames = AVAudioFrameCount(seconds * sampleRate)
+        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frames)!
+        buffer.frameLength = frames
+        for channel in 0..<Int(channels) {
+            let samples = buffer.floatChannelData![channel]
+            for i in 0..<Int(frames) { samples[i] = 0.5 * sin(2 * .pi * 440 * Float(i) / Float(sampleRate)) }
+        }
+        try file.write(from: buffer)
+        return url
+    }
+
+    /// The microphone recorder's format: 16 kHz mono 16-bit CAF.
+    private let micSettings: [String: Any] = [
+        AVFormatIDKey: Int(kAudioFormatLinearPCM), AVSampleRateKey: 16_000.0, AVNumberOfChannelsKey: 1,
+        AVLinearPCMBitDepthKey: 16, AVLinearPCMIsBigEndianKey: false, AVLinearPCMIsFloatKey: false,
+    ]
+
+    @Test(arguments: [1.37, 2.048, 0.25])
+    func microphoneRecordingConverts(seconds: Double) async throws {
+        // 2.048 s is exactly two read chunks — the end-of-file edge case.
+        let input = try makeTone(seconds: seconds, sampleRate: 16_000, channels: 1, ext: "caf", settings: micSettings)
+        defer { try? FileManager.default.removeItem(at: input) }
+
+        let wav = try await AudioConverter.prepareWAV(from: input)
+        defer { try? FileManager.default.removeItem(at: wav.url) }
+
+        #expect(abs(wav.duration - seconds) < 0.05)
+        #expect(wav.peakDBFS > -10)
+        #expect(wav.byteCount > Int(seconds * 16_000 * 2) - 4096)
+    }
+
+    @Test func stereo48kResamplesAndCompresses() async throws {
+        let settings: [String: Any] = [
+            AVFormatIDKey: Int(kAudioFormatLinearPCM), AVSampleRateKey: 48_000.0, AVNumberOfChannelsKey: 2,
+            AVLinearPCMBitDepthKey: 32, AVLinearPCMIsFloatKey: true, AVLinearPCMIsNonInterleaved: true,
+        ]
+        let input = try makeTone(seconds: 3.1, sampleRate: 48_000, channels: 2, ext: "wav", settings: settings)
+        defer { try? FileManager.default.removeItem(at: input) }
+
+        let wav = try await AudioConverter.prepareWAV(from: input)
+        defer { try? FileManager.default.removeItem(at: wav.url) }
+        #expect(abs(wav.duration - 3.1) < 0.05)
+
+        let aac = try await AudioConverter.compressToAAC(wav)
+        defer { try? FileManager.default.removeItem(at: aac.url) }
+        #expect(aac.byteCount > 0 && aac.byteCount < wav.byteCount / 3)
+        #expect(abs(aac.duration - 3.1) < 0.15)
+    }
+
+    @Test func silenceIsMeasuredAsSilence() async throws {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("wf-test-\(UUID().uuidString).caf")
+        defer { try? FileManager.default.removeItem(at: url) }
+        let file = try AVAudioFile(forWriting: url, settings: micSettings, commonFormat: .pcmFormatFloat32, interleaved: false)
+        let format = AVAudioFormat(commonFormat: .pcmFormatFloat32, sampleRate: 16_000, channels: 1, interleaved: false)!
+        let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 16_000)!
+        buffer.frameLength = 16_000
+        try file.write(from: buffer)
+
+        let wav = try await AudioConverter.prepareWAV(from: url)
+        defer { try? FileManager.default.removeItem(at: wav.url) }
+        #expect(wav.peakDBFS < -58)
+    }
+}

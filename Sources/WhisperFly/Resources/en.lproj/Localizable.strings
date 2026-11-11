@@ -361,3 +361,16 @@
 "settings.fn.hint" = "fn on its own always dictates from the microphone. WhisperFly needs Accessibility permission to see the key. Combinations like fn+Delete keep working. Built-in and Apple keyboards only — choose a key combination for other keyboards.";
 "onboarding.try.body_fn_hold" = "Click in the box, then hold fn, speak, and let go. A quick tap on fn starts and stops recording instead. Esc cancels.";
 "onboarding.try.body_fn_toggle" = "Click in the box, tap fn, speak, and tap fn again. Esc cancels.";
+
+/* WhisperFly 3.1 — Intel and macOS 13+ compatibility */
+"system.hardware.rosetta" = "Apple silicon (running the Intel version under Rosetta)";
+"system.hardware.apple_silicon" = "Apple silicon";
+"system.hardware.intel" = "Intel";
+"system.build.universal" = "universal app";
+"settings.appearance" = "Appearance";
+"settings.classic_materials" = "Classic look";
+"settings.classic_materials.hint" = "Use translucent materials instead of Liquid Glass. Lighter on older Intel Macs. Floating windows switch the next time they open.";
+"settings.classic_only" = "Liquid Glass needs macOS 26. On this Mac WhisperFly uses the classic translucent look.";
+"updates.build.mac" = "This Mac";
+"update.install.requires_newer_os" = "This update needs macOS %@ or later, and this Mac runs %@. The installed version was kept.";
+"update.install.unsupported_arch" = "This update does not include a version for this Mac's processor. The installed version was kept.";

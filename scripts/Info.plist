@@ -14,39 +14,35 @@
 	<string>WhisperFly</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
 	<key>CFBundleShortVersionString</key>
 	<string>0.0.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>0</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.productivity</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>14.0</string>
+	<string>13.0</string>
 	<key>LSUIElement</key>
-	<true/>
-	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSAccessibilityUsageDescription</key>
 	<string>WhisperFly needs Accessibility access to type transcribed text into the focused input field.</string>
+	<key>NSHighResolutionCapable</key>
+	<true/>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>WhisperFly needs microphone access to transcribe your speech.</string>
 	<key>NSScreenCaptureUsageDescription</key>
 	<string>WhisperFly needs Screen Recording permission to capture system audio for transcription.</string>
-	<!-- Stamped by scripts/build-app.sh and read by BuildInfo at runtime.
-	     Empty here on purpose: a bare `swift run` sees no bundle at all and
-	     BuildInfo falls back to placeholders, so these only exist to be
-	     overwritten with real values during packaging. -->
-	<key>WhisperFlyCommitSHA</key>
-	<string></string>
-	<key>WhisperFlyCommitDate</key>
+	<key>WhisperFlyBranch</key>
 	<string></string>
 	<key>WhisperFlyBuildDate</key>
 	<string></string>
-	<key>WhisperFlyRepository</key>
+	<key>WhisperFlyCommitDate</key>
 	<string></string>
-	<key>WhisperFlyBranch</key>
+	<key>WhisperFlyCommitSHA</key>
+	<string></string>
+	<key>WhisperFlyRepository</key>
 	<string></string>
 </dict>
 </plist>
