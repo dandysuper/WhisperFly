@@ -22,6 +22,13 @@ BUILD_DIR="$REPO_ROOT/.build/release-stage"
 ENTITLEMENTS="$REPO_ROOT/WhisperFly.entitlements"
 SIGN_APP_SCRIPT="$REPO_ROOT/scripts/sign-app.sh"
 DEVELOPER_IDENTITY="$(security find-identity -v -p codesigning | grep 'Developer ID Application' | head -1 | sed 's/.* "//; s/"$//' || true)"
+# The DMG is signed with Developer ID when there is one, otherwise with the same
+# Apple Development identity sign-app.sh falls back to for the app.
+DMG_IDENTITY="${DEVELOPER_IDENTITY:-$(security find-identity -v -p codesigning | grep 'Apple Development' | head -1 | sed 's/.* "//; s/"$//' || true)}"
+# Optional: RELEASE_NOTES_FILE=notes.md ./scripts/release.sh — otherwise GitHub
+# generates notes from the merged pull requests.
+NOTES_ARGS=(--generate-notes)
+if [[ -n "${RELEASE_NOTES_FILE:-}" ]]; then NOTES_ARGS=(--notes-file "$RELEASE_NOTES_FILE"); fi
 APP_PATH="$REPO_ROOT/$APP_NAME"
 
 echo "==> Building WhisperFly ${TAG}..."
@@ -59,7 +66,7 @@ fi
   --app "$BUILD_DIR/$APP_NAME" \
   --version "$VERSION" \
   --output "$REPO_ROOT/$DMG_NAME" \
-  ${DEVELOPER_IDENTITY:+--sign "$DEVELOPER_IDENTITY"}
+  ${DMG_IDENTITY:+--sign "$DMG_IDENTITY"}
 
 SHA256=$(shasum -a 256 "$REPO_ROOT/$DMG_NAME" | awk '{print $1}')
 echo "==> DMG SHA256: $SHA256"
@@ -73,7 +80,7 @@ gh release create "$TAG" \
   "$REPO_ROOT/$DMG_NAME" \
   --repo dandysuper/WhisperFly \
   --title "WhisperFly ${TAG}" \
-  --generate-notes
+  "${NOTES_ARGS[@]}"
 
 echo "==> Updating Homebrew tap cask..."
 if [[ -d "$TAP_ROOT" ]]; then
