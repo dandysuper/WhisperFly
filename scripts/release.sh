@@ -36,7 +36,7 @@ if [[ ! -d "$APP_PATH" ]]; then
   exit 1
 fi
 
-echo "==> Creating DMG..."
+echo "==> Staging app for the disk image..."
 rm -rf "$BUILD_DIR" && mkdir -p "$BUILD_DIR"
 cp -R "$APP_PATH" "$BUILD_DIR/"
 
@@ -54,17 +54,12 @@ else
     --entitlements "$ENTITLEMENTS"
 fi
 
-rm -f "$REPO_ROOT/$DMG_NAME"
-hdiutil create \
-  -volname "WhisperFly ${VERSION}" \
-  -srcfolder "$BUILD_DIR" \
-  -format UDZO \
-  "$REPO_ROOT/$DMG_NAME"
-
-if [[ -n "$DEVELOPER_IDENTITY" ]]; then
-  echo "==> Signing DMG..."
-  codesign --force --sign "$DEVELOPER_IDENTITY" "$REPO_ROOT/$DMG_NAME"
-fi
+# Drag-to-Applications image with the WhisperFly background and layout.
+"$REPO_ROOT/scripts/make-dmg.sh" \
+  --app "$BUILD_DIR/$APP_NAME" \
+  --version "$VERSION" \
+  --output "$REPO_ROOT/$DMG_NAME" \
+  ${DEVELOPER_IDENTITY:+--sign "$DEVELOPER_IDENTITY"}
 
 SHA256=$(shasum -a 256 "$REPO_ROOT/$DMG_NAME" | awk '{print $1}')
 echo "==> DMG SHA256: $SHA256"

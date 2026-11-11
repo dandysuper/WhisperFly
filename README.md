@@ -266,6 +266,8 @@ Sources/WhisperFly/
 
 Build and release tooling lives in `scripts/`: `build-app.sh` (assemble, stamp,
 check architectures and minimum macOS, sign), `build-dev.sh`, `sign-app.sh`,
+`make-dmg.sh` (drag-to-Applications disk image with the WhisperFly background,
+built headless with [dmgbuild](https://github.com/dmgbuild/dmgbuild)),
 `release.sh` (universal DMG + GitHub release + tap) and `test.sh`. The version
 comes from the `VERSION` file. A deeper write-up of the permission and updater
 work is in [docs/permissions-audit.md](docs/permissions-audit.md).
@@ -494,6 +496,8 @@ requirement, привязанным к команде разработчика. 
 Структура исходников описана в [английском разделе](#architecture). Инструменты
 сборки и релиза — в `scripts/`: `build-app.sh` (сборка, метаданные, проверка
 архитектур и минимальной macOS, подпись), `build-dev.sh`, `sign-app.sh`,
+`make-dmg.sh` (образ диска с фоном WhisperFly и перетаскиванием в
+«Программы», собирается без Finder через [dmgbuild](https://github.com/dmgbuild/dmgbuild)),
 `release.sh` (универсальный DMG + релиз на GitHub + tap) и `test.sh`. Версия
 берётся из файла `VERSION`. Подробный разбор работы с разрешениями и
 обновлениями — в [docs/permissions-audit.md](docs/permissions-audit.md).
