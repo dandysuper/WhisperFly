@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>WhisperFly: free voice dictation for your Mac</title>
+  <meta name="description" content="Hold fn, speak, let go. WhisperFly turns your voice into clean text in any Mac app, with free cloud speech recognition. macOS 13+, Intel and Apple silicon. Open source.">
+  <meta name="theme-color" content="#000000">
+  <meta name="color-scheme" content="dark">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="WhisperFly: speak, and it types.">
+  <meta property="og:description" content="Free voice dictation for macOS. Hold fn, speak, let go. Polished text appears in whatever app you are typing in.">
+  <meta property="og:image" content="https://whisperfly.jebus.bond/assets/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="stylesheet" href="styles.css">
+  <script>document.documentElement.className = matchMedia("(prefers-reduced-motion: reduce)").matches ? "js reduced" : "js";</script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <!-- ───────────── Navigation ───────────── -->
+  <header class="nav" id="top">
+    <nav class="nav__inner" aria-label="Main">
+      <a class="nav__brand" href="#top">
+        <img src="assets/icon-256.png" alt="" width="22" height="22">
+        <span>WhisperFly</span>
+      </a>
+      <ul class="nav__links">
+        <li><a href="#how">How it works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#rewrite">AI rewrite</a></li>
+        <li><a href="#engines">Engines</a></li>
+        <li><a href="https://github.com/dandysuper/WhisperFly" rel="noopener">GitHub</a></li>
+      </ul>
+      <a class="btn btn--small" href="#download">Download</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <!-- ───────────── Hero ───────────── -->
+    <section class="hero">
+      <div class="hero__glow" aria-hidden="true"></div>
+      <img class="hero__icon reveal" src="assets/icon-512.png" alt="WhisperFly app icon" width="128" height="128">
+      <p class="eyebrow reveal">WhisperFly 3.1 for Mac</p>
+      <h1 class="hero__title reveal">Speak.<br><span class="grad">It types.</span></h1>
+      <p class="hero__lede reveal">
+        Hold <kbd>fn</kbd>, talk, let go. Clean, punctuated text appears in whatever app
+        you're typing in, powered by free cloud speech recognition.
+      </p>
+      <div class="hero__cta reveal">
+        <a class="btn" href="https://github.com/dandysuper/WhisperFly/releases/latest/download/WhisperFly.dmg">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 20h14"/></svg>
+          Download for Mac
+        </a>
+        <a class="link" href="#download">Install with Homebrew <span aria-hidden="true">›</span></a>
+      </div>
+      <p class="hero__meta reveal">Free · Open source · macOS 13 Ventura or later · Intel and Apple silicon</p>
+
+      <!-- Product demo: a tiny Mac desktop that dictates on a loop -->
+      <figure class="stage reveal" id="demo" aria-label="Animated demo: holding fn records speech, WhisperFly transcribes and polishes it, then types it into Notes.">
+        <div class="mac">
+          <div class="mac__screen">
+            <div class="menubar" aria-hidden="true">
+              <span class="menubar__apple"></span>
+              <b>Notes</b><span>File</span><span>Edit</span><span>Format</span><span class="hide-sm">View</span><span class="hide-sm">Window</span>
+              <span class="menubar__spacer"></span>
+              <span class="menubar__wf" id="demo-menu-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 10v4M8 7v10M12 4v16M16 7v10M20 10v4"/></svg>
+              </span>
+              <span class="hide-sm">
+                <svg class="menubar__glyph" viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0"/><circle cx="12" cy="19.5" r="1"/></svg>
+              </span>
+              <span id="demo-clock">Fri 9:41</span>
+            </div>
+
+            <div class="window" aria-hidden="true">
+              <div class="window__bar">
+                <i></i><i></i><i></i>
+                <span class="window__title">Launch plan</span>
+              </div>
+              <div class="window__body">
+                <p class="note__title">Launch plan</p>
+                <p class="note__meta">Today at 9:41</p>
+                <p class="note__line" id="demo-text"><span id="demo-typed"></span><span class="caret"></span></p>
+              </div>
+            </div>
+
+            <!-- The floating pill -->
+            <div class="pill-wrap" id="demo-pill" data-state="idle" aria-hidden="true">
+              <div class="pill__side pill__cancel">
+                <svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></svg>
+              </div>
+              <div class="pill">
+                <div class="pill__content pill__content--recording">
+                  <span class="rec-dot"></span>
+                  <span class="wave" id="demo-wave"></span>
+                  <span class="pill__timer" id="demo-timer">0:00</span>
+                </div>
+                <div class="pill__content pill__content--transcribing">
+                  <span class="spinner"></span>
+                  <span class="pill__label"><b>Transcribing…</b><small id="demo-engine">Groq · Whisper Large v3 Turbo</small></span>
+                </div>
+                <div class="pill__content pill__content--rewriting">
+                  <svg class="sparkles" viewBox="0 0 24 24"><path d="M10 3l1.6 4.4L16 9l-4.4 1.6L10 15l-1.6-4.4L4 9l4.4-1.6zM18 13l.9 2.1L21 16l-2.1.9L18 19l-.9-2.1L15 16l2.1-.9z"/></svg>
+                  <span class="pill__label"><b>Polishing…</b><small id="demo-mode">Cleanup</small></span>
+                </div>
+                <div class="pill__content pill__content--done">
+                  <svg class="check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.5l3 3 6-6.5"/></svg>
+                  <span class="pill__label"><b>Done</b></span>
+                </div>
+              </div>
+              <div class="pill__side pill__stop"><span></span></div>
+            </div>
+
+            <!-- What you said -->
+            <p class="speech" id="demo-speech" aria-hidden="true"></p>
+          </div>
+        </div>
+
+        <!-- The fn key under the screen -->
+        <div class="keys" aria-hidden="true">
+          <span class="key key--fn" id="demo-fn"><small>fn</small><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.6 2.4 2.6 14.6 0 17M12 3.5c-2.6 2.4-2.6 14.6 0 17"/></svg></span>
+          <span class="key">control</span>
+          <span class="key">option</span>
+          <span class="key key--cmd">command</span>
+          <span class="key key--space"></span>
+        </div>
+
+        <figcaption class="steps" id="demo-steps">
+          <span data-step="hold">Hold <kbd>fn</kbd></span>
+          <span data-step="speak">Speak</span>
+          <span data-step="release">Let go</span>
+          <span data-step="done">Text appears</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ───────────── Statement ───────────── -->
+    <section class="statement" aria-label="Summary">
+      <p class="statement__text" id="statement">
+        No model downloads. No GPU. No subscription. Just your voice, turned into
+        clean text in any app on your Mac.
+      </p>
+    </section>
+
+    <!-- ───────────── How it works ───────────── -->
+    <section class="section" id="how">
+      <header class="section__head reveal">
+        <p class="eyebrow">How it works</p>
+        <h2>One key. Every app.</h2>
+        <p class="section__lede">WhisperFly lives in your menu bar and waits for <kbd>fn</kbd>. Mail, Slack, Xcode, a browser tab: wherever the cursor is, that's where the words go.</p>
+      </header>
+
+      <ol class="how">
+        <li class="how__card reveal">
+          <div class="how__visual"><span class="key key--big"><small>fn</small></span></div>
+          <h3>Hold fn</h3>
+          <p>A floating pill appears next to your caret with a live waveform. Or tap <kbd>fn</kbd> once to go hands-free, and tap again to stop.</p>
+        </li>
+        <li class="how__card reveal">
+          <div class="how__visual">
+            <div class="mini-pill"><span class="rec-dot"></span><span class="wave wave--static"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+          </div>
+          <h3>Speak naturally</h3>
+          <p>Talk like you would to a person. Ums, restarts and run-on sentences are fine. <kbd>Esc</kbd> cancels from anywhere.</p>
+        </li>
+        <li class="how__card reveal">
+          <div class="how__visual"><p class="how__type">Sounds good, see you at <b>5</b>.<span class="caret"></span></p></div>
+          <h3>Let go</h3>
+          <p>The audio is transcribed, optionally polished by AI, and typed straight into the focused field. If an app refuses, it lands on your clipboard.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ───────────── Features bento ───────────── -->
+    <section class="section" id="features">
+      <header class="section__head reveal">
+        <p class="eyebrow">Features</p>
+        <h2>Small app. Big ears.</h2>
+      </header>
+
+      <div class="bento">
+        <article class="tile tile--glass tile--wide reveal">
+          <div class="tile__text">
+            <h3>Designed for Liquid Glass.</h3>
+            <p>On macOS 26 the pill, menu, settings and history are made of Liquid Glass, and the cancel and stop buttons merge and split as you record. macOS 13 to 15 get a translucent classic look.</p>
+          </div>
+          <div class="glass-demo" aria-hidden="true">
+            <div class="glass-demo__blob glass-demo__blob--a"></div>
+            <div class="glass-demo__blob glass-demo__blob--b"></div>
+            <div class="glass-demo__row">
+              <span class="glass-btn"><svg viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></svg></span>
+              <span class="glass-pill"><span class="rec-dot"></span><span class="wave wave--static"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><b>0:04</b></span>
+              <span class="glass-btn glass-btn--red"><span></span></span>
+            </div>
+          </div>
+        </article>
+
+        <article class="tile reveal">
+          <div class="tile__icon tile__icon--blue">
+            <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+          </div>
+          <h3>Microphone or system audio.</h3>
+          <p>Dictate with the mic, or capture whatever is playing on the Mac (a call, a video, a podcast) through ScreenCaptureKit.</p>
+        </article>
+
+        <article class="tile reveal">
+          <div class="tile__big" data-count="30">30</div>
+          <h3>Spoken languages, or auto‑detect.</h3>
+          <p class="hello" aria-label="Hello in many languages"><span>Hello</span><span>Привет</span><span>Hallo</span><span>こんにちは</span><span>Bonjour</span><span>你好</span><span>Сәлем</span><span>Hola</span><span>안녕하세요</span><span>Ciao</span><span>नमस्ते</span></p>
+        </article>
+
+        <article class="tile reveal">
+          <div class="tile__icon tile__icon--orange">
+            <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13v3M12 11v7M15 13v3"/></svg>
+          </div>
+          <h3>Transcribe files.</h3>
+          <p>Drop a recording on the menu. The text goes to your clipboard.</p>
+          <ul class="chips"><li>MP3</li><li>M4A</li><li>WAV</li><li>FLAC</li><li>OGG</li><li>MP4</li><li>MOV</li></ul>
+        </article>
+
+        <article class="tile reveal">
+          <div class="tile__icon tile__icon--purple">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+          </div>
+          <h3>Searchable history.</h3>
+          <p>Every dictation is kept with its original and polished text. Search, compare, copy, or save it as a file.</p>
+        </article>
+
+        <article class="tile reveal">
+          <div class="tile__icon tile__icon--green">
+            <svg viewBox="0 0 24 24"><path d="M4 7h11M4 12h7M4 17h9"/><path d="M15.5 13.5 18 16l4-4.5"/></svg>
+          </div>
+          <h3>Custom vocabulary.</h3>
+          <p>Teach it the names, products and jargon you use, so <b>Kubernetes</b>, <b>Sasha</b> and <b>SwiftUI</b> come out right every time.</p>
+        </article>
+
+        <article class="tile tile--wide tile--split reveal">
+          <div class="tile__text">
+            <h3>Never stuck on one engine.</h3>
+            <p>Add more than one key and WhisperFly falls back automatically. When an engine fails or hits its limit, the next one takes over, and you can press Retry on anything that slipped through.</p>
+          </div>
+          <div class="chain" aria-hidden="true">
+            <span class="chain__node chain__node--fail">Groq<small>rate limited</small></span>
+            <span class="chain__arrow"></span>
+            <span class="chain__node chain__node--ok">Gemini<small>transcribed</small></span>
+            <span class="chain__arrow chain__arrow--idle"></span>
+            <span class="chain__node">OpenRouter<small>standby</small></span>
+          </div>
+        </article>
+
+        <article class="tile reveal">
+          <div class="tile__icon tile__icon--teal">
+            <svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.6-3 8.4-7 10-4-1.6-7-5.4-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <h3>Permissions that stick.</h3>
+          <p>A live permission center explains what each grant is for, and stable signing keeps them across updates.</p>
+        </article>
+
+        <article class="tile reveal">
+          <div class="tile__icon tile__icon--pink">
+            <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4.5h-4.5"/></svg>
+          </div>
+          <h3>Safe one-click updates.</h3>
+          <p>The built-in updater checks that a new version supports your macOS and processor before it touches the installed app.</p>
+        </article>
+
+        <article class="tile reveal">
+          <div class="tile__icon tile__icon--indigo">
+            <svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          </div>
+          <h3>Thoughtful details.</h3>
+          <p>Read aloud, sound cues, "Always paste" for stubborn apps, silent recordings caught before upload, and Open at login.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ───────────── AI rewrite ───────────── -->
+    <section class="section section--tint" id="rewrite">
+      <header class="section__head reveal">
+        <p class="eyebrow">AI rewrite</p>
+        <h2>Say it rough.<br><span class="grad grad--warm">Send it polished.</span></h2>
+        <p class="section__lede">Pick a mode once and every dictation is rewritten on the way in, through Groq, Gemini, OpenRouter or your own server.</p>
+      </header>
+
+      <div class="rewrite reveal">
+        <div class="segmented" role="tablist" aria-label="Rewrite mode">
+          <button role="tab" aria-selected="true" data-mode="cleanup">Cleanup</button>
+          <button role="tab" aria-selected="false" data-mode="punctuate">Punctuate</button>
+          <button role="tab" aria-selected="false" data-mode="professional">Professional</button>
+          <button role="tab" aria-selected="false" data-mode="translate">Translate</button>
+          <button role="tab" aria-selected="false" data-mode="custom">Custom</button>
+        </div>
+
+        <div class="rewrite__panes">
+          <div class="rewrite__pane">
+            <p class="rewrite__label">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg>
+              You said
+            </p>
+            <p class="rewrite__raw">um so i think we should uh probably ship the update on friday if the the tests pass you know and then tell sasha</p>
+          </div>
+          <div class="rewrite__arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M10 3l1.6 4.4L16 9l-4.4 1.6L10 15l-1.6-4.4L4 9l4.4-1.6zM18 13l.9 2.1L21 16l-2.1.9L18 19l-.9-2.1L15 16l2.1-.9z"/></svg>
+          </div>
+          <div class="rewrite__pane rewrite__pane--out">
+            <p class="rewrite__label" id="rewrite-label">WhisperFly wrote</p>
+            <p class="rewrite__out" id="rewrite-out" aria-live="polite">I think we should probably ship the update on Friday if the tests pass, and then tell Sasha.</p>
+          </div>
+        </div>
+        <p class="rewrite__hint" id="rewrite-hint">Removes filler words and repeats, fixes casing and punctuation, keeps your wording.</p>
+      </div>
+    </section>
+
+    <!-- ───────────── Engines ───────────── -->
+    <section class="section" id="engines">
+      <header class="section__head reveal">
+        <p class="eyebrow">Speech engines</p>
+        <h2>Free to start.<br>Yours to choose.</h2>
+        <p class="section__lede">One free key covers both transcription and AI rewriting. The welcome guide checks it for you on first launch.</p>
+      </header>
+
+      <div class="engines">
+        <article class="engine reveal">
+          <span class="badge badge--green">Free</span>
+          <h3>Groq</h3>
+          <p class="engine__model">Whisper Large v3 Turbo</p>
+          <p>Very fast transcription on a free key from console.groq.com.</p>
+        </article>
+        <article class="engine reveal">
+          <span class="badge badge--green">Free tier</span>
+          <h3>Google Gemini</h3>
+          <p class="engine__model">Gemini 3.5 Transcribe</p>
+          <p>Called directly with an AI Studio key, with smart formatting built in.</p>
+        </article>
+        <article class="engine reveal">
+          <span class="badge">Your key</span>
+          <h3>OpenRouter</h3>
+          <p class="engine__model">Many models</p>
+          <p>Route transcription and rewriting through the models you already pay for.</p>
+        </article>
+        <article class="engine reveal">
+          <span class="badge badge--blue">Self-hosted</span>
+          <h3>OpenAI-compatible</h3>
+          <p class="engine__model">Any server, even whisper.cpp</p>
+          <p>Point it at a local server and your audio never leaves your Mac.</p>
+        </article>
+      </div>
+
+      <p class="privacy reveal">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+        Audio is sent only to the engine you pick, and only when you record or transcribe a file. Your keys are stored on your Mac.
+      </p>
+    </section>
+
+    <!-- ───────────── Compatibility numbers ───────────── -->
+    <section class="section section--numbers">
+      <ul class="numbers">
+        <li class="reveal"><b>13+</b><span>Runs on macOS Ventura and later</span></li>
+        <li class="reveal"><b>2</b><span>Architectures in one universal app: Intel and Apple silicon</span></li>
+        <li class="reveal"><b>11</b><span>Interface languages, from English to Kazakh</span></li>
+        <li class="reveal"><b>0</b><span>Models to download. Nothing runs on your GPU.</span></li>
+      </ul>
+    </section>
+
+    <!-- ───────────── Download ───────────── -->
+    <section class="section download" id="download">
+      <img class="download__icon reveal" src="assets/icon-256.png" alt="" width="96" height="96">
+      <header class="section__head reveal">
+        <h2>Get WhisperFly.</h2>
+        <p class="section__lede">Free and open source. One download for every Mac from 2017 on.</p>
+      </header>
+
+      <div class="install reveal">
+        <div class="segmented segmented--small" role="tablist" aria-label="Install method">
+          <button role="tab" aria-selected="true" aria-controls="tab-brew" id="tabbtn-brew">Homebrew</button>
+          <button role="tab" aria-selected="false" aria-controls="tab-dmg" id="tabbtn-dmg">Disk image</button>
+          <button role="tab" aria-selected="false" aria-controls="tab-src" id="tabbtn-src">From source</button>
+        </div>
+
+        <div class="install__panel" id="tab-brew" role="tabpanel" aria-labelledby="tabbtn-brew">
+          <div class="code">
+            <pre><code><span class="code__prompt">$</span> brew tap dandysuper/tap
+<span class="code__prompt">$</span> brew install --cask whisperfly</code></pre>
+            <button class="code__copy" data-copy="brew tap dandysuper/tap && brew install --cask whisperfly">Copy</button>
+          </div>
+          <p class="install__note">Recommended. Update later with <code>brew upgrade --cask whisperfly</code>.</p>
+        </div>
+
+        <div class="install__panel" id="tab-dmg" role="tabpanel" aria-labelledby="tabbtn-dmg" hidden>
+          <a class="btn btn--large" href="https://github.com/dandysuper/WhisperFly/releases/latest/download/WhisperFly.dmg">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0-5-5m5 5 5-5M5 20h14"/></svg>
+            Download WhisperFly.dmg
+          </a>
+          <p class="install__note">Open it and drag WhisperFly to Applications. If macOS says the app is damaged or blocks it, choose <b>Open Anyway</b> in System Settings → Privacy &amp; Security, or run:</p>
+          <div class="code">
+            <pre><code><span class="code__prompt">$</span> xattr -cr /Applications/WhisperFly.app</code></pre>
+            <button class="code__copy" data-copy="xattr -cr /Applications/WhisperFly.app">Copy</button>
+          </div>
+        </div>
+
+        <div class="install__panel" id="tab-src" role="tabpanel" aria-labelledby="tabbtn-src" hidden>
+          <div class="code">
+            <pre><code><span class="code__prompt">$</span> git clone https://github.com/dandysuper/WhisperFly.git
+<span class="code__prompt">$</span> cd WhisperFly
+<span class="code__prompt">$</span> ./scripts/build-app.sh --universal
+<span class="code__prompt">$</span> open WhisperFly.app</code></pre>
+            <button class="code__copy" data-copy="git clone https://github.com/dandysuper/WhisperFly.git && cd WhisperFly && ./scripts/build-app.sh --universal && open WhisperFly.app">Copy</button>
+          </div>
+          <p class="install__note">Needs Xcode 16 or its Command Line Tools. Liquid Glass is compiled in with Xcode 26 or later.</p>
+        </div>
+      </div>
+
+      <div class="setup reveal">
+        <h3>Then, in about a minute:</h3>
+        <ol>
+          <li><b>Paste a free key.</b> Get one from <a href="https://console.groq.com/keys" rel="noopener">Groq</a> or <a href="https://aistudio.google.com/apikey" rel="noopener">Google AI Studio</a>.</li>
+          <li><b>Allow the Microphone and Accessibility.</b> Screen Recording only if you want system audio.</li>
+          <li><b>Set "Press 🌐 key to" to "Do Nothing"</b> in System Settings → Keyboard, so <kbd>fn</kbd> belongs to WhisperFly.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <!-- ───────────── Footer ───────────── -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <p class="footer__brand"><img src="assets/icon-256.png" alt="" width="20" height="20"> WhisperFly</p>
+      <ul class="footer__links">
+        <li><a href="https://github.com/dandysuper/WhisperFly" rel="noopener">Source code</a></li>
+        <li><a href="https://github.com/dandysuper/WhisperFly/releases" rel="noopener">Releases</a></li>
+        <li><a href="https://github.com/dandysuper/WhisperFly/issues" rel="noopener">Report an issue</a></li>
+        <li><a href="https://github.com/dandysuper/WhisperFly#русский" rel="noopener">По-русски</a></li>
+      </ul>
+      <p class="footer__fine">
+        WhisperFly is a fork of <a href="https://github.com/hukopo/qwenwishper" rel="noopener">qwenwishper</a>.
+        Mac, macOS, Liquid Glass and Apple silicon are trademarks of Apple Inc. WhisperFly is not affiliated with Apple, Groq, Google or OpenRouter.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
